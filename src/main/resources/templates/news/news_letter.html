@@ -35,6 +35,7 @@
     <script> listener_aside_nav_active("news", 2); </script>
 
     <main class="content-area newsletter-page">
+        <div id="newsletter_unsubscribe_notice" class="newsletter-empty mb-3" style="display:none;"></div>
         <div class="newsletter-toolbar">
             <div class="newsletter-search">
                 <input type="text" id="newsletter_keyword" placeholder="" />
@@ -43,12 +44,7 @@
                 </button>
             </div>
             <div class="newsletter-filter">
-                <select id="newsletter_category" onchange="reload_newsletter_list();">
-                    <option value="all">All</option>
-                    <option value="company">company</option>
-                    <option value="student">student</option>
-                    <option value="interview">interview</option>
-                </select>
+                <input type="text" id="newsletter_category" placeholder="카테고리 (쉼표로 여러개)" />
             </div>
         </div>
 
@@ -72,13 +68,44 @@
     let newsletterLoading = false;
 
     $(function(){
+        render_newsletter_unsubscribe_notice();
         $("#newsletter_keyword").on("keydown", function(e){
             if (e.key === "Enter") {
                 reload_newsletter_list();
             }
         });
+        $("#newsletter_category").on("keydown", function(e){
+            if (e.key === "Enter") {
+                reload_newsletter_list();
+            }
+        });
+        $(document).on("click", ".js-newsletter-popup", function(e){
+            e.preventDefault();
+            let encodedUrl = $(this).attr("data-popup-url") || "";
+            let targetUrl = decodeURIComponent(encodedUrl);
+            open_newsletter_popup(targetUrl);
+        });
         reload_newsletter_list();
     });
+
+    function render_newsletter_unsubscribe_notice() {
+        let params = new URLSearchParams(window.location.search || "");
+        let state = (params.get("unsubscribe") || "").trim();
+        if (!state) {
+            return;
+        }
+
+        let target = $("#newsletter_unsubscribe_notice");
+        if (state === "success") {
+            target.text("뉴스레터 구독이 취소되었습니다.");
+            target.show();
+            return;
+        }
+        if (state === "invalid") {
+            target.text("유효하지 않은 구독취소 링크입니다.");
+            target.show();
+        }
+    }
 
     function reload_newsletter_list() {
         newsletterCursor = null;
@@ -137,20 +164,15 @@
     }
 
     function append_newsletter_item(item) {
-        let id = item.id || 0;
         let vol = item.vol == null ? "-" : item.vol;
         let title = escape_html(item.title || "제목 없음");
         let summary = escape_html(item.summary || "");
-        let tags = escape_html(item.tags || "");
-        let category = escape_html(item.category || "company");
+        let categoryHtml = render_newsletter_category_chips(item.category);
         let img = item.img && (item.img + "").trim() ? item.img : NEWSLETTER_DEFAULT_IMAGE;
         let detailUrl = item.detailUrl && (item.detailUrl + "").trim() ? item.detailUrl : NEWSLETTER_DEFAULT_DETAIL_URL;
-
-        let href = id > 0
-            ? ("/news/news_letter/detail/" + id)
-            : detailUrl;
-
-        let target = id > 0 ? "_self" : "_blank";
+        let encodedDetailUrl = encodeURIComponent(detailUrl);
+        let href = detailUrl;
+        let target = "_blank";
 
         let thumbMarkup = img
             ? ("<img class='newsletter-thumb' src='" + img + "' alt='뉴스레터 이미지'>")
@@ -158,14 +180,16 @@
 
         let card = ""
             + "<article class='newsletter-item'>"
-            + "  <a href='" + href + "' target='" + target + "' rel='noopener noreferrer'>"
+            + "  <a class='js-newsletter-popup' href='" + href + "' data-popup-url='" + encodedDetailUrl + "' target='" + target + "' rel='noopener noreferrer'>"
             +      thumbMarkup
             + "  </a>"
             + "  <div class='newsletter-body'>"
             + "    <div class='newsletter-vol'>Vol." + vol + "</div>"
-            + "    <a class='newsletter-title' href='" + href + "' target='" + target + "' rel='noopener noreferrer'>" + title + "</a>"
-            + "    <div class='newsletter-summary'>" + (tags || summary) + "</div>"
-            + "    <span class='newsletter-category'>" + category + "</span>"
+            + "    <a class='newsletter-title js-newsletter-popup' href='" + href + "' data-popup-url='" + encodedDetailUrl + "' target='" + target + "' rel='noopener noreferrer'>" + title + "</a>"
+            + "    <div class='newsletter-summary'>" + summary + "</div>"
+            + "    <div class='newsletter-meta-row'>"
+            +        categoryHtml
+            + "    </div>"
             + "  </div>"
             + "</article>";
 
@@ -210,6 +234,31 @@
         func_ajax(_data);
     }
 
+    function open_newsletter_popup(url) {
+        let targetUrl = (url || "").trim();
+        if (!targetUrl) {
+            targetUrl = NEWSLETTER_DEFAULT_DETAIL_URL;
+        }
+
+        const width = 1200;
+        const height = 800;
+        const left = Math.max(0, Math.round((window.screen.width - width) / 2));
+        const top = Math.max(0, Math.round((window.screen.height - height) / 2));
+        const options = "width=" + width
+            + ",height=" + height
+            + ",left=" + left
+            + ",top=" + top
+            + ",resizable=yes,scrollbars=yes";
+
+        const popup = window.open(targetUrl, "newsletterPopup", options);
+        if (popup) {
+            popup.focus();
+            return;
+        }
+
+        window.open(targetUrl, "_blank", "noopener,noreferrer");
+    }
+
     function escape_html(value) {
         return (value + "")
             .replace(/&/g, "&amp;")
@@ -217,6 +266,48 @@
             .replace(/>/g, "&gt;")
             .replace(/\"/g, "&quot;")
             .replace(/'/g, "&#39;");
+    }
+
+    function split_newsletter_categories(value) {
+        let raw = (value || "").trim();
+        if (!raw) {
+            return [];
+        }
+        let tokens = raw.split(/[,\n;]+/);
+        let result = [];
+        let seen = {};
+        for (let each of tokens) {
+            let token = (each || "").trim();
+            if (!token) {
+                continue;
+            }
+            if (token.startsWith("#")) {
+                token = token.substring(1).trim();
+            }
+            token = token.replace(/\s+/g, " ");
+            if (!token) {
+                continue;
+            }
+            let lower = token.toLowerCase();
+            if (seen[lower]) {
+                continue;
+            }
+            seen[lower] = true;
+            result.push(token);
+        }
+        return result;
+    }
+
+    function render_newsletter_category_chips(value) {
+        let categories = split_newsletter_categories(value);
+        if (categories.length === 0) {
+            return "<span class='newsletter-category-chip newsletter-category-chip-empty'>미분류</span>";
+        }
+        let chips = "";
+        for (let each of categories) {
+            chips += "<span class='newsletter-category-chip'>" + escape_html(each) + "</span>";
+        }
+        return "<span class='newsletter-category-list'>" + chips + "</span>";
     }
 </script>
 

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<th:block th:replace="~{includes/user/head}" />
+<body>
+
+<th:block th:replace="~{includes/user/header}" />
+
+<main style="max-width: 760px; margin: 72px auto; padding: 0 16px;">
+    <section style="border:1px solid #d6deea; border-radius:12px; background:#ffffff; padding:28px 24px;">
+        <h1 id="unsubscribe_title" style="margin:0 0 12px; font-size:26px; color:#14213d;">뉴스레터 구독 상태</h1>
+        <p id="unsubscribe_desc" style="margin:0 0 24px; color:#334155; line-height:1.55;">
+            처리 결과를 확인하는 중입니다.
+        </p>
+        <a href="/news/news_letter" style="display:inline-block; padding:10px 16px; border-radius:8px; background:#0f3b82; color:#fff; text-decoration:none; font-weight:700;">
+            뉴스레터 페이지로 이동
+        </a>
+    </section>
+</main>
+
+<th:block th:replace="~{includes/user/footer}" />
+<th:block th:replace="~{includes/user/bottom}" />
+
+<script>
+    $(function(){
+        let params = new URLSearchParams(window.location.search || "");
+        let status = (params.get("status") || "").trim();
+        if (status === "success") {
+            $("#unsubscribe_title").text("구독 취소가 완료되었습니다.");
+            $("#unsubscribe_desc").text("이제 뉴스레터 안내 메일이 발송되지 않습니다. 다시 구독하려면 뉴스레터 페이지에서 이메일을 등록해 주세요.");
+            return;
+        }
+        $("#unsubscribe_title").text("구독 취소 링크가 유효하지 않습니다.");
+        $("#unsubscribe_desc").text("이미 처리된 링크이거나 잘못된 주소일 수 있습니다. 문제가 계속되면 관리자에게 문의해 주세요.");
+    });
+</script>
+
+</body>
+</html>

@@ -81,25 +81,32 @@
         }
 
         let routeMap = {
-            notice: { label: "공지사항", url: "/notice/admin_list" },
-            faq: { label: "FAQ", url: "/faq/admin_list" },
-            popup: { label: "팝업", url: "/popup/admin_list" },
-            board: { label: "일반게시판", url: "/board/admin_list" },
+            permission: { label: "권한", url: "/permission/admin_list" },
             user: { label: "사용자", url: "/user/admin_list" },
-            permission: { label: "권한", url: "/permission/admin_list" }
+            notice: { label: "공지사항", url: "/notice/admin_list" },
+            news_letter: { label: "뉴스레터", url: "/news/admin_news_letter" },
+            extracurricular_activities: { label: "대외활동", url: "/news/admin_extracurricular_activities" },
+            board: { label: "일반게시판", url: "/board/admin_list" },
+            support_project: { label: "지원 프로젝트", url: "/support_project/admin_list" },
+            faq: { label: "FAQ", url: "/faq/admin_list" },
+            popup: { label: "팝업", url: "/popup/admin_list" }
         };
 
-        let first = null;
         let chips = [];
-        for(let t of targets){
+        let uniqueTargets = [...new Set(targets)];
+        for(let t of uniqueTargets){
             if(routeMap[t]){
-                chips.push("<span class='badge badge-primary mr-1'>" + routeMap[t].label + "</span>");
-                if(first == null){
-                    first = routeMap[t];
-                }
+                chips.push("<a class='badge badge-primary mr-1 mb-1' href='" + routeMap[t].url + "'>" + routeMap[t].label + "</a>");
             }
         }
 
+        if(chips.length === 0){
+            guide.html(
+                "<p class='mb-2'>권한은 확인되었지만 연결된 관리자 메뉴가 없습니다.</p>" +
+                "<p class='mb-0 text-muted'>권한 상세에서 타깃 설정을 확인해 주세요.</p>"
+            );
+            return;
+        }
 
         guide.html(
             "<p class='mb-2'>접근 가능한 관리자 메뉴입니다.</p>" +

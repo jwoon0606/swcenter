@@ -4,12 +4,14 @@ import com.thc.sprbasic2025.domain.Newsletter;
 import com.thc.sprbasic2025.domain.NewsletterSubscriber;
 import com.thc.sprbasic2025.dto.DefaultDto;
 import com.thc.sprbasic2025.dto.NewsletterDto;
+import com.thc.sprbasic2025.dto.PermissionDto;
 import com.thc.sprbasic2025.exception.NoMatchingDataException;
 import com.thc.sprbasic2025.repository.NewsletterRepository;
 import com.thc.sprbasic2025.repository.NewsletterSubscriberRepository;
 import com.thc.sprbasic2025.service.NewsletterService;
 import com.thc.sprbasic2025.service.PermittedService;
 import com.thc.sprbasic2025.util.FileUpload;
+import com.thc.sprbasic2025.util.NewsletterMailSender;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -18,8 +20,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -29,6 +33,7 @@ public class NewsletterServiceimpl implements NewsletterService {
     final NewsletterRepository newsletterRepository;
     final NewsletterSubscriberRepository newsletterSubscriberRepository;
     final PermittedService permittedService;
+    final NewsletterMailSender newsletterMailSender;
 
     @Override
     public DefaultDto.CreateResDto create(NewsletterDto.CreateReqDto param, Long reqUserId) {
@@ -42,6 +47,7 @@ public class NewsletterServiceimpl implements NewsletterService {
         if (param.getDetailUrl() == null || param.getDetailUrl().trim().isEmpty()) {
             param.setDetailUrl(NewsletterDto.DEFAULT_DETAIL_URL);
         }
+        param.setCategory(normalizeCategoryString(param.getCategory()));
 
         return newsletterRepository.save(param.toEntity()).toCreateResDto();
     }
@@ -49,6 +55,9 @@ public class NewsletterServiceimpl implements NewsletterService {
     @Override
     public void update(NewsletterDto.UpdateReqDto param, Long reqUserId) {
         permittedService.isPermitted(reqUserId, target, 120);
+        if (param.getCategory() != null) {
+            param.setCategory(normalizeCategoryString(param.getCategory()));
+        }
         Newsletter newsletter = newsletterRepository.findById(param.getId())
                 .orElseThrow(() -> new NoMatchingDataException("no data"));
         newsletter.update(param);
@@ -71,7 +80,8 @@ public class NewsletterServiceimpl implements NewsletterService {
     public NewsletterDto.DetailResDto detail(DefaultDto.DetailReqDto param, Long reqUserId) {
         Newsletter newsletter = newsletterRepository.findByIdAndDeletedFalse(param.getId())
                 .orElseThrow(() -> new NoMatchingDataException("no data"));
-        return toDetail(newsletter);
+        boolean canUpdate = canManageNewsletter(reqUserId);
+        return toDetail(newsletter, canUpdate);
     }
 
     @Override
@@ -80,6 +90,7 @@ public class NewsletterServiceimpl implements NewsletterService {
         if (param.getDeleted() == null) {
             param.setDeleted(false);
         }
+        boolean canUpdate = canManageNewsletter(reqUserId);
 
         Sort.Direction direction = "ASC".equalsIgnoreCase(param.getOrderway())
                 ? Sort.Direction.ASC
@@ -96,14 +107,16 @@ public class NewsletterServiceimpl implements NewsletterService {
                 String likeKeyword = "%" + keyword + "%";
                 predicates.add(cb.or(
                         cb.like(root.get("title"), likeKeyword),
-                        cb.like(root.get("summary"), likeKeyword),
-                        cb.like(root.get("tags"), likeKeyword)
+                        cb.like(root.get("summary"), likeKeyword)
                 ));
             }
 
             String category = safeTrim(param.getCategory());
             if (!category.isEmpty() && !"all".equalsIgnoreCase(category)) {
-                predicates.add(cb.equal(cb.lower(root.get("category")), category.toLowerCase(Locale.ROOT)));
+                List<String> categoryTags = parseCategoryTags(category);
+                for (String eachTag : categoryTags) {
+                    predicates.add(cb.like(cb.lower(root.get("category")), "%" + eachTag.toLowerCase(Locale.ROOT) + "%"));
+                }
             }
 
             if (param.getCursor() != null) {
@@ -120,7 +133,7 @@ public class NewsletterServiceimpl implements NewsletterService {
         List<Newsletter> rows = newsletterRepository.findAll(spec, pageable).getContent();
         List<NewsletterDto.DetailResDto> result = new ArrayList<>();
         for (Newsletter row : rows) {
-            result.add(toDetail(row));
+            result.add(toDetail(row, canUpdate));
         }
         return result;
     }
@@ -145,6 +158,8 @@ public class NewsletterServiceimpl implements NewsletterService {
             NewsletterSubscriber created = newsletterSubscriberRepository.save(
                     NewsletterSubscriber.of(name, email, true)
             );
+            String unsubscribeToken = ensureUnsubscribeToken(created);
+            newsletterMailSender.sendSubscriptionConfirmed(email, name, unsubscribeToken);
             return NewsletterDto.SubscribeResDto.builder()
                     .id(created.getId())
                     .created(true)
@@ -154,6 +169,8 @@ public class NewsletterServiceimpl implements NewsletterService {
 
         existed.resubscribe(name);
         NewsletterSubscriber updated = newsletterSubscriberRepository.save(existed);
+        String unsubscribeToken = ensureUnsubscribeToken(updated);
+        newsletterMailSender.sendSubscriptionConfirmed(email, name, unsubscribeToken);
         return NewsletterDto.SubscribeResDto.builder()
                 .id(updated.getId())
                 .created(false)
@@ -161,7 +178,76 @@ public class NewsletterServiceimpl implements NewsletterService {
                 .build();
     }
 
-    private NewsletterDto.DetailResDto toDetail(Newsletter row) {
+    @Override
+    public NewsletterDto.UnsubscribeResDto unsubscribeByToken(String token) {
+        String unsubscribeToken = safeTrim(token);
+        if (unsubscribeToken.isEmpty()) {
+            return NewsletterDto.UnsubscribeResDto.builder().unsubscribed(false).build();
+        }
+
+        NewsletterSubscriber subscriber = newsletterSubscriberRepository.findByUnsubscribeToken(unsubscribeToken);
+        if (subscriber == null) {
+            return NewsletterDto.UnsubscribeResDto.builder().unsubscribed(false).build();
+        }
+        if (!Boolean.TRUE.equals(subscriber.getDeleted())) {
+            subscriber.unsubscribe();
+            newsletterSubscriberRepository.save(subscriber);
+        }
+        return NewsletterDto.UnsubscribeResDto.builder().unsubscribed(true).build();
+    }
+
+    @Override
+    public NewsletterDto.SendResDto sendToSubscribers(DefaultDto.DetailReqDto param, Long reqUserId) {
+        permittedService.isPermitted(reqUserId, target, 120);
+        if (!newsletterMailSender.isConfigured()) {
+            throw new RuntimeException("mailbox config is incomplete: " + newsletterMailSender.getMissingConfigKeys());
+        }
+
+        Newsletter newsletter = newsletterRepository.findByIdAndDeletedFalse(param.getId())
+                .orElseThrow(() -> new NoMatchingDataException("no data"));
+
+        String detailUrl = safeDetailUrl(newsletter.getDetailUrl());
+        List<NewsletterSubscriber> subscribers = newsletterSubscriberRepository.findAllByDeletedFalseOrderByIdAsc();
+        int successCount = 0;
+        int failedCount = 0;
+
+        for (NewsletterSubscriber subscriber : subscribers) {
+            String email = safeTrim(subscriber.getEmail()).toLowerCase(Locale.ROOT);
+            if (!isValidEmail(email)) {
+                failedCount++;
+                continue;
+            }
+
+            String name = safeTrim(subscriber.getName());
+            if (name.isEmpty()) {
+                name = "구독자";
+            }
+            String unsubscribeToken = ensureUnsubscribeToken(subscriber);
+
+            boolean sent = newsletterMailSender.sendNewsletterIssue(
+                    email,
+                    newsletter.getVol(),
+                    newsletter.getTitle(),
+                    detailUrl,
+                    unsubscribeToken
+            );
+
+            if (sent) {
+                successCount++;
+            } else {
+                failedCount++;
+            }
+        }
+
+        return NewsletterDto.SendResDto.builder()
+                .newsletterId(newsletter.getId())
+                .totalCount(subscribers.size())
+                .successCount(successCount)
+                .failedCount(failedCount)
+                .build();
+    }
+
+    private NewsletterDto.DetailResDto toDetail(Newsletter row, boolean canUpdate) {
         return NewsletterDto.DetailResDto.builder()
                 .id(row.getId())
                 .deleted(row.getDeleted())
@@ -170,12 +256,10 @@ public class NewsletterServiceimpl implements NewsletterService {
                 .vol(row.getVol())
                 .title(row.getTitle())
                 .summary(row.getSummary())
-                .content(row.getContent())
-                .tags(row.getTags())
-                .category(row.getCategory())
+                .category(normalizeCategoryString(row.getCategory()))
                 .img(row.getImg())
                 .detailUrl(safeDetailUrl(row.getDetailUrl()))
-                .publishedDate(row.getPublishedDate())
+                .canUpdate(canUpdate)
                 .build();
     }
 
@@ -189,5 +273,62 @@ public class NewsletterServiceimpl implements NewsletterService {
 
     private String safeTrim(String value) {
         return value == null ? "" : value.trim();
+    }
+
+    private boolean canManageNewsletter(Long reqUserId) {
+        if (reqUserId == null || reqUserId <= 0) {
+            return false;
+        }
+        return permittedService.permitted(PermissionDto.PermittedReqDto.builder()
+                .userId(reqUserId)
+                .target(target)
+                .func(120)
+                .build());
+    }
+
+    private boolean isValidEmail(String email) {
+        return !email.isEmpty() && email.contains("@") && !email.startsWith("@") && !email.endsWith("@");
+    }
+
+    private String ensureUnsubscribeToken(NewsletterSubscriber subscriber) {
+        if (subscriber == null) {
+            return "";
+        }
+        String token = safeTrim(subscriber.getUnsubscribeToken());
+        if (!token.isEmpty()) {
+            return token;
+        }
+        subscriber.ensureUnsubscribeToken();
+        NewsletterSubscriber saved = newsletterSubscriberRepository.save(subscriber);
+        return safeTrim(saved.getUnsubscribeToken());
+    }
+
+    private List<String> parseCategoryTags(String value) {
+        Set<String> tags = new LinkedHashSet<>();
+        Set<String> seenLower = new LinkedHashSet<>();
+        String raw = safeTrim(value);
+        if (raw.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        String[] splits = raw.split("[,;\\n]+");
+        for (String split : splits) {
+            String token = safeTrim(split);
+            if (token.startsWith("#")) {
+                token = safeTrim(token.substring(1));
+            }
+            token = token.replaceAll("\\s+", " ");
+            String lower = token.toLowerCase(Locale.ROOT);
+            if (!token.isEmpty() && !seenLower.contains(lower)) {
+                tags.add(token);
+                seenLower.add(lower);
+            }
+        }
+        return new ArrayList<>(tags);
+    }
+
+    private String normalizeCategoryString(String value) {
+        List<String> tags = parseCategoryTags(value);
+        return String.join(", ", tags);
     }
 }

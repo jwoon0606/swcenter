@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URI;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class NewsletterRestController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("")
+    @PostMapping(value = "", consumes = "multipart/form-data")
     public ResponseEntity<DefaultDto.CreateResDto> create(
             @RequestPart NewsletterDto.CreateReqDto params,
             @RequestPart(required = false) MultipartFile file,
@@ -36,6 +37,16 @@ public class NewsletterRestController {
     ) {
         Long reqUserId = getReqUserId(principalDetails);
         params.setFile(file);
+        return ResponseEntity.ok(newsletterService.create(params, reqUserId));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping(value = "", consumes = "application/json")
+    public ResponseEntity<DefaultDto.CreateResDto> createByJson(
+            @RequestBody NewsletterDto.CreateReqDto params,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        Long reqUserId = getReqUserId(principalDetails);
         return ResponseEntity.ok(newsletterService.create(params, reqUserId));
     }
 
@@ -98,5 +109,25 @@ public class NewsletterRestController {
             @RequestBody NewsletterDto.SubscribeReqDto params
     ) {
         return ResponseEntity.ok(newsletterService.subscribe(params));
+    }
+
+    @PreAuthorize("permitAll()")
+    @GetMapping("/unsubscribe")
+    public ResponseEntity<Void> unsubscribeByToken(@RequestParam String token) {
+        NewsletterDto.UnsubscribeResDto res = newsletterService.unsubscribeByToken(token);
+        String status = (res != null && Boolean.TRUE.equals(res.getUnsubscribed())) ? "success" : "invalid";
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("/news/unsubscribe_result?status=" + status))
+                .build();
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/send")
+    public ResponseEntity<NewsletterDto.SendResDto> sendToSubscribers(
+            @RequestBody DefaultDto.DetailReqDto params,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        Long reqUserId = getReqUserId(principalDetails);
+        return ResponseEntity.ok(newsletterService.sendToSubscribers(params, reqUserId));
     }
 }

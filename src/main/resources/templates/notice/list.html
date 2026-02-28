@@ -60,9 +60,6 @@
         <ul class="notice-items" id="notice_list"></ul>
 
         <div class="notice-bottom-bar">
-            <div class="notice-write-wrap" id="notice_write_wrap" style="display: none;">
-                <button class="notice-write-button" onclick="location.href='/notice/create'; return false;">글쓰기</button>
-            </div>
             <div class="notice-pagination" id="notice_pagination"></div>
         </div>
     </main>
@@ -82,7 +79,6 @@
             listener_notice_keyword_changed();
         });
 
-        load_notice_write_visibility();
         search_notice();
     });
 
@@ -199,30 +195,6 @@
         $pagination.append($next);
     }
 
-    function load_notice_write_visibility(){
-        $("#notice_write_wrap").hide();
-
-        if (!listener_is_login()) {
-            return;
-        }
-
-        let _data = new Map();
-        _data.url = "/api/permissiondetail/allow";
-        _data.type = "POST";
-        _data.param = {
-            target: "notice",
-            func: 110
-        };
-        _data.success = function(obj_data){
-            if(obj_data != null && obj_data.allowed === true){
-                $("#notice_write_wrap").show();
-            }
-        };
-        _data.error = function(){
-            $("#notice_write_wrap").hide();
-        };
-        func_ajax(_data);
-    }
 </script>
 </body>
 

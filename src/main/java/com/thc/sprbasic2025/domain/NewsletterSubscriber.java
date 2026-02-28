@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @EntityListeners(AuditingEntityListener.class)
 @Getter
@@ -18,10 +19,12 @@ import java.time.LocalDateTime;
 @Table(
         indexes = {
                 @Index(columnList = "deleted"),
-                @Index(columnList = "email")
+                @Index(columnList = "email"),
+                @Index(columnList = "unsubscribeToken")
         },
         uniqueConstraints = {
-                @UniqueConstraint(name = "UQ_newsletter_subscriber_email", columnNames = {"email"})
+                @UniqueConstraint(name = "UQ_newsletter_subscriber_email", columnNames = {"email"}),
+                @UniqueConstraint(name = "UQ_newsletter_subscriber_unsubscribe_token", columnNames = {"unsubscribeToken"})
         }
 )
 @Entity
@@ -33,6 +36,8 @@ public class NewsletterSubscriber extends AuditingFields {
 
     Boolean agreePrivacy;
     LocalDateTime subscribedAt;
+    @Column(length = 64)
+    String unsubscribeToken;
 
     protected NewsletterSubscriber() {}
 
@@ -41,6 +46,7 @@ public class NewsletterSubscriber extends AuditingFields {
         this.email = email;
         this.agreePrivacy = agreePrivacy;
         this.subscribedAt = LocalDateTime.now();
+        this.unsubscribeToken = newUnsubscribeToken();
     }
 
     public static NewsletterSubscriber of(String name, String email, Boolean agreePrivacy) {
@@ -51,6 +57,21 @@ public class NewsletterSubscriber extends AuditingFields {
         this.name = name;
         this.agreePrivacy = true;
         this.subscribedAt = LocalDateTime.now();
+        ensureUnsubscribeToken();
         this.setDeleted(false);
+    }
+
+    public void unsubscribe() {
+        this.setDeleted(true);
+    }
+
+    public void ensureUnsubscribeToken() {
+        if (this.unsubscribeToken == null || this.unsubscribeToken.trim().isEmpty()) {
+            this.unsubscribeToken = newUnsubscribeToken();
+        }
+    }
+
+    private String newUnsubscribeToken() {
+        return UUID.randomUUID().toString().replace("-", "");
     }
 }

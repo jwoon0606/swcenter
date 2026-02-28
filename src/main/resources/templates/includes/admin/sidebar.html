@@ -40,18 +40,40 @@
             </div>
         </div>
     </li>
-    <li class="nav-item nav_div_notice nav_div_faq nav_div_popup nav_div_board nav_div_support_project" style="display: none">
-        <a class="nav-link collapsed nav_notice_a nav_faq_a nav_popup_a nav_board_a nav_support_project_a" href="#" data-toggle="collapse" data-target="#nav_notice_div" aria-expanded="true" aria-controls="collapseTwo">
+    <li class="nav-item nav_div_notice nav_div_board" style="display: none">
+        <a class="nav-link collapsed nav_notice_a nav_board_a" href="#" data-toggle="collapse" data-target="#nav_notice_div" aria-expanded="true" aria-controls="collapseTwo">
             <i class="fas fa-fw fa-cog"></i>
-            <span>게시글</span>
+            <span>알림/소식</span>
         </a>
-        <div id="nav_notice_div" class="collapse nav_notice_div nav_faq_div nav_popup_div nav_board_div nav_support_project_div" aria-labelledby="headingNotice" data-parent="#accordionSidebar">
+        <div id="nav_notice_div" class="collapse nav_notice_div nav_board_div" aria-labelledby="headingNotice" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item nav_div_notice" href="/notice/admin_list" style="display: none">공지사항</a>
+                <a class="collapse-item nav_div_board" href="/board/admin_list" style="display: none">일반게시판</a>
+            </div>
+        </div>
+    </li>
+    <li class="nav-item nav_div_news_letter nav_div_extracurricular_activities nav_div_support_project" style="display: none">
+        <a class="nav-link collapsed nav_news_letter_a nav_extracurricular_activities_a nav_support_project_a" href="#" data-toggle="collapse" data-target="#nav_content_div" aria-expanded="true" aria-controls="collapseTwo">
+            <i class="fas fa-fw fa-cog"></i>
+            <span>콘텐츠</span>
+        </a>
+        <div id="nav_content_div" class="collapse nav_news_letter_div nav_extracurricular_activities_div nav_support_project_div" aria-labelledby="headingContent" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item nav_div_news_letter" href="/news/admin_news_letter" style="display: none">뉴스레터</a>
+                <a class="collapse-item nav_div_extracurricular_activities" href="/news/admin_extracurricular_activities" style="display: none">대외활동</a>
+                <a class="collapse-item nav_div_support_project" href="/support_project/admin_list" style="display: none">지원 프로젝트</a>
+            </div>
+        </div>
+    </li>
+    <li class="nav-item nav_div_faq nav_div_popup" style="display: none">
+        <a class="nav-link collapsed nav_faq_a nav_popup_a" href="#" data-toggle="collapse" data-target="#nav_etc_div" aria-expanded="true" aria-controls="collapseTwo">
+            <i class="fas fa-fw fa-cog"></i>
+            <span>기타</span>
+        </a>
+        <div id="nav_etc_div" class="collapse nav_faq_div nav_popup_div" aria-labelledby="headingEtc" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item nav_div_faq" href="/faq/admin_list" style="display: none">FAQ</a>
                 <a class="collapse-item nav_div_popup" href="/popup/admin_list" style="display: none">팝업</a>
-                <a class="collapse-item nav_div_board" href="/board/admin_list" style="display: none">일반게시판</a>
-                <a class="collapse-item nav_div_support_project" href="/support_project/admin_list" style="display: none">지원 프로젝트</a>
             </div>
         </div>
     </li>
@@ -81,7 +103,9 @@
             let targets = [];
             for(let each of tempList){
                 let tempTarget = each["target"];
-                targets.push(tempTarget);
+                if(targets.indexOf(tempTarget) < 0){
+                    targets.push(tempTarget);
+                }
                 $(".nav_div_" + tempTarget).css("display", "");
             }
             if(tempList.length === 0){

@@ -5,8 +5,6 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
-
 public class NewsletterDto {
     public static final String DEFAULT_DETAIL_URL = "https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html";
 
@@ -15,12 +13,9 @@ public class NewsletterDto {
         Integer vol;
         String title;
         String summary;
-        String content;
-        String tags;
         String category;
         String img;
         String detailUrl;
-        LocalDate publishedDate;
 
         private MultipartFile file;
 
@@ -29,12 +24,9 @@ public class NewsletterDto {
                     getVol(),
                     getTitle(),
                     getSummary(),
-                    getContent(),
-                    getTags(),
                     getCategory(),
                     getImg(),
-                    getDetailUrl(),
-                    getPublishedDate()
+                    getDetailUrl()
             );
         }
     }
@@ -44,12 +36,9 @@ public class NewsletterDto {
         Integer vol;
         String title;
         String summary;
-        String content;
-        String tags;
         String category;
         String img;
         String detailUrl;
-        LocalDate publishedDate;
     }
 
     @Getter @Setter @SuperBuilder @NoArgsConstructor @AllArgsConstructor
@@ -57,12 +46,10 @@ public class NewsletterDto {
         Integer vol;
         String title;
         String summary;
-        String content;
-        String tags;
         String category;
         String img;
         String detailUrl;
-        LocalDate publishedDate;
+        Boolean canUpdate;
     }
 
     @Getter @Setter @SuperBuilder @NoArgsConstructor @AllArgsConstructor
@@ -82,5 +69,18 @@ public class NewsletterDto {
         Long id;
         Boolean created;
         Boolean subscribed;
+    }
+
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class SendResDto {
+        Long newsletterId;
+        Integer totalCount;
+        Integer successCount;
+        Integer failedCount;
+    }
+
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class UnsubscribeResDto {
+        Boolean unsubscribed;
     }
 }

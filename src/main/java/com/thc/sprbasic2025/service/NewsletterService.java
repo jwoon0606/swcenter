@@ -17,4 +17,6 @@ public interface NewsletterService {
     List<NewsletterDto.DetailResDto> scrollList(NewsletterDto.ScrollListReqDto param, Long reqUserId);
 
     NewsletterDto.SubscribeResDto subscribe(NewsletterDto.SubscribeReqDto param);
+    NewsletterDto.UnsubscribeResDto unsubscribeByToken(String token);
+    NewsletterDto.SendResDto sendToSubscribers(DefaultDto.DetailReqDto param, Long reqUserId);
 }

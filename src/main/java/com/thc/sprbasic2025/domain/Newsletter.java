@@ -11,8 +11,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDate;
-
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
@@ -29,37 +27,25 @@ public class Newsletter extends AuditingFields {
     @Column(columnDefinition = "TEXT")
     String summary;
 
-    @Column(columnDefinition = "TEXT")
-    String content;
-
-    @Column(length = 1000)
-    String tags;
-
     @Column(length = 100)
     String category;
 
     String img;
     String detailUrl;
-    LocalDate publishedDate;
 
     protected Newsletter() {}
 
-    private Newsletter(Integer vol, String title, String summary, String content, String tags, String category,
-                       String img, String detailUrl, LocalDate publishedDate) {
+    private Newsletter(Integer vol, String title, String summary, String category, String img, String detailUrl) {
         this.vol = vol;
         this.title = title;
         this.summary = summary;
-        this.content = content;
-        this.tags = tags;
         this.category = category;
         this.img = img;
         this.detailUrl = detailUrl;
-        this.publishedDate = publishedDate;
     }
 
-    public static Newsletter of(Integer vol, String title, String summary, String content, String tags, String category,
-                                String img, String detailUrl, LocalDate publishedDate) {
-        return new Newsletter(vol, title, summary, content, tags, category, img, detailUrl, publishedDate);
+    public static Newsletter of(Integer vol, String title, String summary, String category, String img, String detailUrl) {
+        return new Newsletter(vol, title, summary, category, img, detailUrl);
     }
 
     public DefaultDto.CreateResDto toCreateResDto() {
@@ -71,11 +57,8 @@ public class Newsletter extends AuditingFields {
         if (param.getVol() != null) { setVol(param.getVol()); }
         if (param.getTitle() != null) { setTitle(param.getTitle()); }
         if (param.getSummary() != null) { setSummary(param.getSummary()); }
-        if (param.getContent() != null) { setContent(param.getContent()); }
-        if (param.getTags() != null) { setTags(param.getTags()); }
         if (param.getCategory() != null) { setCategory(param.getCategory()); }
         if (param.getImg() != null) { setImg(param.getImg()); }
         if (param.getDetailUrl() != null) { setDetailUrl(param.getDetailUrl()); }
-        if (param.getPublishedDate() != null) { setPublishedDate(param.getPublishedDate()); }
     }
 }

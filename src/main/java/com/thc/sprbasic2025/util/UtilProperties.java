@@ -7,10 +7,18 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 public class UtilProperties {
-	@Value("${mailbox.host}")
+	@Value("${mailbox.host:}")
 	private String host;
-	@Value("${mailbox.username}")
+	@Value("${mailbox.username:}")
 	private String username;
-	@Value("${mailbox.password}")
+	@Value("${mailbox.password:}")
 	private String password;
+	@Value("${mailbox.smtp-host:}")
+	private String smtpHost;
+	@Value("${mailbox.smtp-port:587}")
+	private String smtpPort;
+	@Value("${mailbox.from-address:}")
+	private String fromAddress;
+	@Value("${mailbox.unsubscribe-base-url:http://localhost:8080}")
+	private String unsubscribeBaseUrl;
 }

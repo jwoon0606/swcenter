@@ -77,19 +77,25 @@
     transform-origin: left center;
 }
 
-.newsletter-filter select {
+.newsletter-filter input {
     border: none;
     background: transparent;
     color: #404040;
-    font-size: 19px;
+    font-size: 16px;
     font-weight: 500;
     line-height: 1.1;
-    padding: 0 20px 0 0;
-    cursor: pointer;
+    padding: 0 0 6px;
+    border-bottom: 1px solid #8f8f8f;
+    min-width: 230px;
 }
 
-.newsletter-filter select:focus {
+.newsletter-filter input::placeholder {
+    color: #8f8f8f;
+}
+
+.newsletter-filter input:focus {
     outline: none;
+    border-bottom-color: #5f7090;
 }
 
 .newsletter-subscribe {
@@ -248,15 +254,49 @@
     word-break: keep-all;
 }
 
-.newsletter-category {
-    display: inline-block;
-    border-radius: 18px;
+.newsletter-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.newsletter-category-list {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.newsletter-category-chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 16px;
     background: #2f3034;
     color: #fff;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 1;
-    padding: 8px 18px;
+    padding: 7px 12px;
+}
+
+.newsletter-category-chip-empty {
+    background: #6b7280;
+}
+
+.newsletter-send-button {
+    border: 1px solid #0d4c9c;
+    border-radius: 18px;
+    background: #fff;
+    color: #0d4c9c;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 8px 14px;
+    cursor: pointer;
+}
+
+.newsletter-send-button:hover {
+    background: #f3f8ff;
 }
 
 .newsletter-empty {
@@ -394,8 +434,9 @@
         font-size: 16px;
     }
 
-    .newsletter-filter select {
-        font-size: 16px;
+    .newsletter-filter input {
+        font-size: 14px;
+        min-width: 180px;
     }
 
     .newsletter-feed {
@@ -432,8 +473,8 @@
         margin-bottom: 12px;
     }
 
-    .newsletter-category {
-        font-size: 13px;
-        padding: 7px 14px;
+    .newsletter-category-chip {
+        font-size: 12px;
+        padding: 7px 10px;
     }
 }
