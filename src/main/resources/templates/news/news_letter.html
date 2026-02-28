@@ -2,28 +2,245 @@
 <html lang="ko">
 <th:block th:replace="~{includes/user/head}" />
 <link rel="stylesheet" href="/frontswcenter/css/aside.css">
+<link rel="stylesheet" href="/frontswcenter/css/newsletter.css">
 <body>
 
 <th:block th:replace="~{includes/user/header}" />
 
-<div class="page-layout">
-    <th:block th:replace="~{includes/user/aside}" />
+<div class="page-layout newsletter-page-layout">
+    <div class="newsletter-side-rail">
+        <th:block th:replace="~{includes/user/aside}" />
+
+        <section class="newsletter-subscribe">
+            <h2>Newsletter</h2>
+            <p class="newsletter-description">소중한 하루를 만드는 정보와 이야기를 전하는 월간 온라인 매거진
+
+한동대 소중대 소식, 기업인 인터뷰, 경제 뉴스, 영화 추천 등 다양한 주제를 담아 한 달에 한 번 발간됩니다.
+흥미로운 사람들의 이야기와 새로운 시각을 통해 독자 여러분의 하루를 더 가치 있게 만듭니다.</p>
+
+            <div class="newsletter-form-group">
+                <input type="text" id="newsletter_subscriber_name" placeholder="Name" />
+            </div>
+            <div class="newsletter-form-group">
+                <input type="email" id="newsletter_subscriber_email" placeholder="Email" />
+            </div>
+            <label class="newsletter-agree">
+                <input type="checkbox" id="newsletter_agree" />
+                <span>개인정보 수집 및 이용에 동의합니다.</span>
+            </label>
+
+            <button class="newsletter-subscribe-button" onclick="subscribe_newsletter(); return false;">SUBSCRIBE</button>
+        </section>
+    </div>
     <script> listener_aside_nav_active("news", 2); </script>
 
-    <main class="content-area">
-        <h1 class="page-title">뉴스레터</h1>
-
-        <div class="content-box">
-            여기에 "뉴스레터" 본문 내용을 넣으면 됩니다!
-            <br><br>
-            이미지나 표 영역이 들어가요.
+    <main class="content-area newsletter-page">
+        <div class="newsletter-toolbar">
+            <div class="newsletter-search">
+                <input type="text" id="newsletter_keyword" placeholder="" />
+                <button onclick="reload_newsletter_list(); return false;" aria-label="검색">
+                    <span class="newsletter-search-icon" aria-hidden="true"></span>
+                </button>
+            </div>
+            <div class="newsletter-filter">
+                <select id="newsletter_category" onchange="reload_newsletter_list();">
+                    <option value="all">All</option>
+                    <option value="company">company</option>
+                    <option value="student">student</option>
+                    <option value="interview">interview</option>
+                </select>
+            </div>
         </div>
 
+        <section>
+            <div class="newsletter-feed" id="newsletter_list"></div>
+            <div class="newsletter-load-wrap" id="newsletter_load_wrap" style="display:none;">
+                <button onclick="search_newsletter(); return false;">더보기</button>
+            </div>
+        </section>
     </main>
 </div>
 
 <th:block th:replace="~{includes/user/footer}" />
 <th:block th:replace="~{includes/user/bottom}" />
+
+<script>
+    const NEWSLETTER_DEFAULT_DETAIL_URL = "https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html";
+    const NEWSLETTER_DEFAULT_IMAGE = "";
+
+    let newsletterCursor = null;
+    let newsletterLoading = false;
+
+    $(function(){
+        $("#newsletter_keyword").on("keydown", function(e){
+            if (e.key === "Enter") {
+                reload_newsletter_list();
+            }
+        });
+        reload_newsletter_list();
+    });
+
+    function reload_newsletter_list() {
+        newsletterCursor = null;
+        $("#newsletter_list").html("");
+        $("#newsletter_load_wrap").hide();
+        search_newsletter();
+    }
+
+    function search_newsletter() {
+        if (newsletterLoading) {
+            return;
+        }
+        newsletterLoading = true;
+
+        let _data = new Map();
+        _data.url = "/api/newsletter/scrollList";
+        _data.type = "GET";
+        _data.param = {
+            perpage: 6,
+            orderby: "id",
+            orderway: "DESC",
+            cursor: newsletterCursor,
+            deleted: false,
+            keyword: $("#newsletter_keyword").val(),
+            category: $("#newsletter_category").val()
+        };
+        _data.success = function(list){
+            let rows = list || [];
+            if (rows.length === 0 && newsletterCursor == null) {
+                if (is_default_filter()) {
+                    render_fallback_newsletters();
+                } else {
+                    $("#newsletter_list").html("<div class='newsletter-empty'>등록된 뉴스레터가 없습니다.</div>");
+                }
+                $("#newsletter_load_wrap").hide();
+                newsletterLoading = false;
+                return;
+            }
+
+            for (let each of rows) {
+                append_newsletter_item(each);
+            }
+
+            if (rows.length > 0) {
+                newsletterCursor = rows[rows.length - 1].id;
+            }
+
+            if (rows.length >= 6) {
+                $("#newsletter_load_wrap").show();
+            } else {
+                $("#newsletter_load_wrap").hide();
+            }
+            newsletterLoading = false;
+        };
+        _data.error = function(){
+            newsletterLoading = false;
+            alert("뉴스레터 목록을 불러오지 못했습니다.");
+        };
+        func_ajax(_data);
+    }
+
+    function is_default_filter() {
+        let keyword = ($("#newsletter_keyword").val() || "").trim();
+        let category = ($("#newsletter_category").val() || "all").toLowerCase();
+        return keyword === "" && category === "all";
+    }
+
+    function render_fallback_newsletters() {
+        let samples = [
+            { id: 0, vol: 1, title: "혁신을 이끄는 리더, 홍길동의 경영 철학", tags: "#비전 #창업 계기 #혁신 #고객 신뢰 #팀 헌신 #열린 소통 #지속 가능성", category: "company", img: "", detailUrl: NEWSLETTER_DEFAULT_DETAIL_URL },
+            { id: 0, vol: 2, title: "이번주의 소식들을 집합해놓은 제목", tags: "#안에 어떤 내용들이 있는지 알려줌. #인터뷰는 무조건들어가기 때문에 #밑에 회사인지 학생인지 구분", category: "company", img: "", detailUrl: NEWSLETTER_DEFAULT_DETAIL_URL },
+            { id: 0, vol: 3, title: "이번주의 소식들을 집합해놓은 제목", tags: "#안에 어떤 내용들이 있는지 알려줌. #인터뷰는 무조건들어가기 때문에 #밑에 회사인지 학생인지 구분", category: "company", img: "", detailUrl: NEWSLETTER_DEFAULT_DETAIL_URL },
+            { id: 0, vol: 4, title: "이번주의 소식들을 집합해놓은 제목", tags: "#안에 어떤 내용들이 있는지 알려줌. #인터뷰는 무조건들어가기 때문에 #밑에 회사인지 학생인지 구분", category: "company", img: "", detailUrl: NEWSLETTER_DEFAULT_DETAIL_URL }
+        ];
+        for (let each of samples) {
+            append_newsletter_item(each);
+        }
+    }
+
+    function append_newsletter_item(item) {
+        let id = item.id || 0;
+        let vol = item.vol == null ? "-" : item.vol;
+        let title = escape_html(item.title || "제목 없음");
+        let summary = escape_html(item.summary || "");
+        let tags = escape_html(item.tags || "");
+        let category = escape_html(item.category || "company");
+        let img = item.img && (item.img + "").trim() ? item.img : NEWSLETTER_DEFAULT_IMAGE;
+        let detailUrl = item.detailUrl && (item.detailUrl + "").trim() ? item.detailUrl : NEWSLETTER_DEFAULT_DETAIL_URL;
+
+        let href = id > 0
+            ? ("/news/news_letter/detail/" + id)
+            : detailUrl;
+
+        let target = id > 0 ? "_self" : "_blank";
+
+        let thumbMarkup = img
+            ? ("<img class='newsletter-thumb' src='" + img + "' alt='뉴스레터 이미지'>")
+            : "<div class='newsletter-thumb newsletter-thumb-fallback' aria-hidden='true'></div>";
+
+        let card = ""
+            + "<article class='newsletter-item'>"
+            + "  <a href='" + href + "' target='" + target + "' rel='noopener noreferrer'>"
+            +      thumbMarkup
+            + "  </a>"
+            + "  <div class='newsletter-body'>"
+            + "    <div class='newsletter-vol'>Vol." + vol + "</div>"
+            + "    <a class='newsletter-title' href='" + href + "' target='" + target + "' rel='noopener noreferrer'>" + title + "</a>"
+            + "    <div class='newsletter-summary'>" + (tags || summary) + "</div>"
+            + "    <span class='newsletter-category'>" + category + "</span>"
+            + "  </div>"
+            + "</article>";
+
+        $("#newsletter_list").append(card);
+    }
+
+    function subscribe_newsletter() {
+        let name = ($("#newsletter_subscriber_name").val() || "").trim();
+        let email = ($("#newsletter_subscriber_email").val() || "").trim();
+        let agree = $("#newsletter_agree").is(":checked");
+
+        if (!name) {
+            alert("이름을 입력해주세요.");
+            return;
+        }
+        if (!email || email.indexOf("@") < 1 || email.endsWith("@")) {
+            alert("올바른 이메일을 입력해주세요.");
+            return;
+        }
+        if (!agree) {
+            alert("개인정보 수집 및 이용 동의가 필요합니다.");
+            return;
+        }
+
+        let _data = new Map();
+        _data.url = "/api/newsletter/subscribe";
+        _data.type = "POST";
+        _data.param = {
+            name: name,
+            email: email,
+            agreePrivacy: agree
+        };
+        _data.success = function(){
+            alert("구독 신청이 완료되었습니다.");
+            $("#newsletter_subscriber_name").val("");
+            $("#newsletter_subscriber_email").val("");
+            $("#newsletter_agree").prop("checked", false);
+        };
+        _data.error = function(){
+            alert("구독 신청에 실패했습니다. 잠시 후 다시 시도해주세요.");
+        };
+        func_ajax(_data);
+    }
+
+    function escape_html(value) {
+        return (value + "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/\"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+</script>
 
 </body>
 </html>

@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.header.writers.CrossOriginOpenerPolicyHeaderWriter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -45,7 +46,11 @@ public class SecurityConfig {
 	 */
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.headers().frameOptions().sameOrigin();
+		http.headers(headers -> headers
+				.frameOptions(frameOptions -> frameOptions.sameOrigin())
+				.crossOriginOpenerPolicy(crossOriginOpenerPolicy -> crossOriginOpenerPolicy
+						.policy(CrossOriginOpenerPolicyHeaderWriter.CrossOriginOpenerPolicy.SAME_ORIGIN_ALLOW_POPUPS))
+		);
 		http
 				.csrf(AbstractHttpConfigurer::disable)
 					.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
@@ -63,18 +68,14 @@ public class SecurityConfig {
 	    /**
 		 *  Jwt Token Authentication을 위한 filter 설정.
 		 *  
-		 *  jwtAuthenticationFilter: 인증을 위한 필터("/api/login")
 		 *  JwtAuthorizationFilter: 인가를 위한 필터
 		 *  FilterExceptionHandlerFilter: TokenExpiredException 핸들링을 위한 필터 
 		 */
 		@Override
 		public void configure(HttpSecurity http) throws Exception {
 			AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
-			JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, objectMapper, authService, externalProperties);
-			jwtAuthenticationFilter.setFilterProcessesUrl("/api/login");
 			
 			http.addFilter(corsFilterConfiguration.corsFilter())
-				.addFilter(jwtAuthenticationFilter)
 				.addFilter(new JwtAuthorizationFilter(authenticationManager, userRepository, authService, externalProperties))
 				.addFilterBefore(new FilterExceptionHandlerFilter(), BasicAuthenticationFilter.class);
 		}

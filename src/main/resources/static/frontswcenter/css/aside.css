@@ -90,6 +90,215 @@
     font-weight: 600;
 }
 
+.board-list-page {
+    padding-top: 12px;
+}
+
+.board-list-page .board-list-tools {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 18px;
+    margin-bottom: 56px;
+}
+
+.board-list-page .board-search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: min(310px, 100%);
+    border-bottom: 1px solid #6f7279;
+    padding-right: 6px;
+}
+
+.board-list-page .board-search-box input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    color: #1a1d24;
+    padding: 10px 34px 10px 2px;
+    outline: none;
+}
+
+.board-list-page .board-search-box input::placeholder {
+    color: #9ea4b2;
+}
+
+.board-list-page .board-search-box button {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 28px;
+    height: 28px;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.board-list-page .board-search-box button::before {
+    content: "";
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 1.8px solid #1a1d24;
+    border-radius: 50%;
+    left: 4px;
+    top: 4px;
+}
+
+.board-list-page .board-search-box button::after {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 2px;
+    background: #1a1d24;
+    transform: rotate(45deg);
+    right: 2px;
+    bottom: 6px;
+}
+
+.board-list-page .board-filter-box select {
+    border: none;
+    background: transparent;
+    color: #4b4f57;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0 24px 0 4px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.board-list-page .board-filter-box {
+    position: relative;
+}
+
+.board-list-page .board-filter-box::after {
+    content: "";
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-right: 1.5px solid #4b4f57;
+    border-bottom: 1.5px solid #4b4f57;
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+}
+
+.board-list-page .board-table-box {
+    border-top: 4px solid #222744;
+    margin-bottom: 34px;
+}
+
+.board-list-page .board-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.board-list-page .board-table th,
+.board-list-page .board-table td {
+    border-bottom: 1px solid #7a7a7a;
+    font-size: 16px;
+    color: #1a1d24;
+}
+
+.board-list-page .board-table th {
+    text-align: left;
+    font-weight: 600;
+    padding: 18px 20px;
+}
+
+.board-list-page .board-table td {
+    padding: 22px 20px;
+}
+
+.board-list-page .board-table th:nth-child(1),
+.board-list-page .board-table td:nth-child(1) {
+    width: 26%;
+}
+
+.board-list-page .board-table th:nth-child(2),
+.board-list-page .board-table td:nth-child(2) {
+    width: 44%;
+}
+
+.board-list-page .board-table th:nth-child(3),
+.board-list-page .board-table td:nth-child(3) {
+    width: 14%;
+}
+
+.board-list-page .board-table th:nth-child(4),
+.board-list-page .board-table td:nth-child(4) {
+    width: 16%;
+}
+
+.board-list-page .board-title-link {
+    color: #1a1d24;
+    text-decoration: none;
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.board-list-page .board-title-link:hover {
+    text-decoration: underline;
+}
+
+.board-list-page .board-empty-row {
+    text-align: center;
+    color: #767a85;
+    padding: 32px 12px;
+}
+
+.board-list-page .board-list-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.board-list-page .board-write-button {
+    min-width: 182px;
+    padding: 12px 22px;
+    border-radius: 0;
+    font-size: 16px;
+}
+
+.board-list-page .board-pagination {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.board-list-page .board-pagination button {
+    border: none;
+    background: transparent;
+    color: #1a1d24;
+    font-size: 16px;
+    min-width: 34px;
+    height: 34px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+}
+
+.board-list-page .board-pagination button.is-disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.board-list-page .board-pagination button.is-active {
+    text-decoration: underline;
+    text-underline-offset: 8px;
+}
+
 .primary-button {
     background: #09316b;
     color: #fff;
@@ -121,7 +330,8 @@
 }
 
 .form-field input,
-.form-field textarea {
+.form-field textarea,
+.form-field select {
     width: 100%;
     box-sizing: border-box;
     border: 1px solid #d7dde6;
@@ -134,6 +344,50 @@
 .form-field textarea {
     min-height: 180px;
     resize: vertical;
+}
+
+.board-create-page .content-box {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+}
+
+.board-create-page .form-row-inline {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.board-create-page .checkbox-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.board-create-page .check-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1e2f4a;
+}
+
+.board-create-page .check-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+}
+
+.board-create-page .field-note {
+    margin: 0;
+    font-size: 12px;
+    color: #6b7a90;
+}
+
+.board-create-page .content-actions {
+    gap: 10px;
+    margin-top: 4px;
 }
 
 .content-meta {
@@ -422,8 +676,49 @@
         white-space: nowrap;
     }
 
+    .board-list-page .board-list-tools {
+        margin-bottom: 22px;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .board-list-page .board-search-box {
+        width: 100%;
+    }
+
+    .board-list-page .board-filter-box {
+        align-self: flex-end;
+    }
+
+    .board-list-page .board-table-box {
+        overflow-x: auto;
+    }
+
+    .board-list-page .board-table {
+        min-width: 640px;
+    }
+
+    .board-list-page .board-list-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .board-list-page .board-write-button {
+        width: 100%;
+    }
+
+    .board-list-page .board-pagination {
+        width: 100%;
+        justify-content: center;
+    }
+
     .detail-page .detail-card {
         padding: 22px;
+    }
+
+    .board-create-page .form-row-inline {
+        grid-template-columns: 1fr;
+        gap: 10px;
     }
 
     .detail-page .detail-meta {

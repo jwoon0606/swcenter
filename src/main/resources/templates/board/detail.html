@@ -11,7 +11,7 @@
     <script> listener_aside_nav_active("board", 1); </script>
 
     <main class="content-area detail-page">
-        <h1 class="page-title">일반게시판</h1>
+        <h1 class="page-title"><a href="/board/list" style="color: inherit; text-decoration: none;">일반게시판</a></h1>
 
         <div class="content-box detail-card">
             <div class="detail-title font_board_title">-</div>
@@ -23,8 +23,12 @@
                 <span>좋아요 <span id="board_like_count">0</span></span>
                 <div class="detail-actions">
                     <button class="ghost-button" id="board_like_btn" onclick="toggle_board_like(); return false;">좋아요</button>
-                    <button class="ghost-button" id="board_report_btn" onclick="report_board(); return false;">신고하기</button>
+                    <button class="ghost-button" id="board_edit_btn" style="display:none;" onclick="location.href='/board/edit/' + currentBoardId; return false;">글 수정</button>
+                    <button class="ghost-button" id="board_delete_btn" style="display:none;" onclick="delete_board(); return false;">글 삭제</button>
                 </div>
+            </div>
+            <div id="board_image_wrap" style="display:none; margin: 16px 0;">
+                <img id="board_image" src="" alt="게시글 대표 이미지" style="max-width:100%; border-radius:12px;">
             </div>
             <div class="detail-body font_board_content">-</div>
 
@@ -52,76 +56,283 @@
 
 <script>
     let currentBoardId = null;
-    let currentBoardViewCount = null;
+    let currentBoardData = null;
+    let editingCommentId = null;
+    let editingCommentText = "";
+    const boardLikeStoragePrefix = "board_like_";
 
     function render_board_extras(data) {
-        let likeCount = parseInt(data.likeCount, 10);
         let viewCount = parseInt(data.viewCount, 10);
+        let likeCount = parseInt(data.likeCount, 10);
         $("#board_view_count").text(Number.isFinite(viewCount) ? viewCount : 0);
         $("#board_like_count").text(Number.isFinite(likeCount) ? likeCount : 0);
-        $("#board_like_btn").text("좋아요");
-        $("#board_report_btn").prop("disabled", false).text("신고하기");
+        let liked = get_board_like_state();
+        $("#board_like_btn").text(liked ? "좋아요 취소" : "좋아요");
+        render_board_image(currentBoardData || data);
+        if (data && data.canUpdate === true) {
+            $("#board_edit_btn").show();
+            $("#board_delete_btn").show();
+        } else {
+            $("#board_edit_btn").hide();
+            $("#board_delete_btn").hide();
+        }
     }
-    function toggle_board_like() {
-        if (!currentBoardId) { return; }
-        alert("좋아요 버튼 클릭");
-    }
-    function report_board() {
-        if (!currentBoardId) { return; }
-        alert("신고 처리 버튼 클릭");
-    }
-    function get_board_comments(id) {
-        return [];
-    }
-    function render_board_comments(id) {
-        let list = get_board_comments(id);
-        let $list = $("#board_comment_list");
-        $list.html("");
-        if (list.length === 0) {
-            $list.append("<div class=\"comment-empty\">등록된 댓글이 없습니다.</div>");
+    function render_board_image(data) {
+        let img = (data && data.img) ? (data.img + "").trim() : "";
+        if (!img) {
+            $("#board_image_wrap").hide();
+            $("#board_image").attr("src", "");
             return;
         }
-        for (let item of list) {
-            let $item = $("<div class=\"comment-item\"></div>");
-            $("<div class=\"comment-text\"></div>").text(item.text).appendTo($item);
-            $("<div class=\"comment-meta\"></div>").text(item.createdAt).appendTo($item);
-            $list.append($item);
-        }
+        $("#board_image").attr("src", img);
+        $("#board_image_wrap").show();
     }
+
+    function toggle_board_like() {
+        if (!currentBoardId) { return; }
+        let liked = !get_board_like_state();
+        let _data = new Map();
+        _data.url = "/api/board/like";
+        _data.type = "POST";
+        _data.param = {
+            id: currentBoardId,
+            liked: liked
+        };
+        _data.success = function (obj_data) {
+            set_board_like_state(liked);
+            if (currentBoardData == null) {
+                currentBoardData = {};
+            }
+            currentBoardData.viewCount = obj_data.viewCount;
+            currentBoardData.likeCount = obj_data.likeCount;
+            render_board_extras(currentBoardData);
+        };
+        _data.error = function () {
+            alert("좋아요 처리 중 오류가 발생했습니다.");
+        };
+        func_ajax(_data);
+    }
+
+    function render_board_comments(id) {
+        let $list = $("#board_comment_list");
+        let _data = new Map();
+        _data.url = "/api/board/comment/list";
+        _data.type = "GET";
+        _data.param = { id: id };
+        _data.success = function(list){
+            $list.html("");
+            if (list == null || list.length === 0) {
+                $list.append("<div class=\"comment-empty\">등록된 댓글이 없습니다.</div>");
+                return;
+            }
+            for (let item of list) {
+                let $item = $("<div class=\"comment-item\"></div>");
+                if (editingCommentId === item.id) {
+                    let $editorWrap = $("<div class=\"comment-edit-wrap\" style=\"margin-bottom:8px;\"></div>");
+                    $("<textarea class=\"input_param\" rows=\"3\" style=\"width:100%;\"></textarea>")
+                        .attr("id", "board_comment_edit_input_" + item.id)
+                        .val(editingCommentText)
+                        .appendTo($editorWrap);
+                    $item.append($editorWrap);
+                } else {
+                    $("<div class=\"comment-text\" data-comment-id=\"" + item.id + "\"></div>").text(item.content || "").appendTo($item);
+                }
+                let metaText = ((item.userNick || item.userEmail || "익명") + " · " + (item.createdAt || ""));
+                $("<div class=\"comment-meta\"></div>").text(metaText).appendTo($item);
+                if (item.editable === true || item.deletable === true) {
+                    let $actions = $("<div class=\"comment-actions\" style=\"margin-top:8px;\"></div>");
+                    if (item.editable === true) {
+                        if (editingCommentId === item.id) {
+                            $("<button class=\"ghost-button\" style=\"margin-right:8px;\">저장</button>")
+                                .on("click", function(){ save_board_comment_edit(item.id); })
+                                .appendTo($actions);
+                            $("<button class=\"ghost-button\" style=\"margin-right:8px;\">취소</button>")
+                                .on("click", function(){ cancel_board_comment_edit(); })
+                                .appendTo($actions);
+                        } else {
+                            $("<button class=\"ghost-button\" style=\"margin-right:8px;\">수정</button>")
+                                .on("click", function(){ begin_board_comment_edit(item.id, item.content || ""); })
+                                .appendTo($actions);
+                        }
+                    }
+                    if (item.deletable === true) {
+                        $("<button class=\"ghost-button\">삭제</button>")
+                            .on("click", function(){ delete_board_comment(item.id); })
+                            .appendTo($actions);
+                    }
+                    $item.append($actions);
+                }
+                $list.append($item);
+            }
+        };
+        _data.error = function(){
+            $list.html("<div class=\"comment-empty\">댓글을 불러오지 못했습니다.</div>");
+        };
+        func_ajax(_data);
+    }
+
     function add_board_comment() {
         if (!currentBoardId) { return; }
+        if (!listener_is_login()) {
+            alert("로그인 후 댓글을 작성할 수 있습니다.");
+            return;
+        }
         let text = $("#board_comment_input").val().trim();
         if (!text) {
             alert("댓글 내용을 입력해주세요.");
             return;
         }
-        alert("댓글 등록 버튼 클릭");
+        let _data = new Map();
+        _data.url = "/api/board/comment";
+        _data.type = "POST";
+        _data.param = {
+            boardId: currentBoardId,
+            content: text
+        };
+        _data.success = function(){
+            $("#board_comment_input").val("");
+            render_board_comments(currentBoardId);
+        };
+        _data.error = function(){
+            alert("댓글 등록 중 오류가 발생했습니다.");
+        };
+        func_ajax(_data);
+    }
+
+    function begin_board_comment_edit(commentId, content) {
+        editingCommentId = commentId;
+        editingCommentText = content || "";
+        render_board_comments(currentBoardId);
+    }
+
+    function cancel_board_comment_edit() {
+        editingCommentId = null;
+        editingCommentText = "";
+        render_board_comments(currentBoardId);
+    }
+
+    function save_board_comment_edit(commentId) {
+        let inputId = "#board_comment_edit_input_" + commentId;
+        let nextText = ($(inputId).val() || "").trim();
+        if (!nextText) {
+            alert("댓글 내용을 입력해주세요.");
+            return;
+        }
+        let _data = new Map();
+        _data.url = "/api/board/comment";
+        _data.type = "PUT";
+        _data.param = {
+            id: commentId,
+            content: nextText
+        };
+        _data.success = function(){
+            editingCommentId = null;
+            editingCommentText = "";
+            render_board_comments(currentBoardId);
+        };
+        _data.error = function(){
+            alert("댓글 수정 중 오류가 발생했습니다.");
+        };
+        func_ajax(_data);
+    }
+
+    function delete_board_comment(commentId) {
+        if (!confirm("댓글을 삭제하시겠습니까?")) {
+            return;
+        }
+        if (editingCommentId === commentId) {
+            editingCommentId = null;
+            editingCommentText = "";
+        }
+        let _data = new Map();
+        _data.url = "/api/board/comment";
+        _data.type = "DELETE";
+        _data.param = {
+            id: commentId
+        };
+        _data.success = function(){
+            render_board_comments(currentBoardId);
+        };
+        _data.error = function(){
+            alert("댓글 삭제 중 오류가 발생했습니다.");
+        };
+        func_ajax(_data);
+    }
+
+    function delete_board() {
+        if (!currentBoardId) { return; }
+        if (!confirm("이 게시글을 삭제하시겠습니까?")) {
+            return;
+        }
+        let _data = new Map();
+        _data.url = "/api/board";
+        _data.type = "DELETE";
+        _data.param = {
+            id: currentBoardId
+        };
+        _data.success = function(){
+            alert("삭제되었습니다.");
+            location.href = "/board/list";
+        };
+        _data.error = function(){
+            alert("글 삭제 중 오류가 발생했습니다.");
+        };
+        func_ajax(_data);
     }
 
     $(function(){
-        console.log( "ready!" );
         detail_board();
     });
+
     function detail_board() {
         let boardId = getIdFromUrl(null);
+        currentBoardId = boardId;
+        let _viewData = new Map();
+        _viewData.url = "/api/board/view";
+        _viewData.type = "POST";
+        _viewData.param = {'id': boardId};
+        _viewData.success = function () {
+            load_board_detail(boardId);
+        };
+        _viewData.error = function () {
+            load_board_detail(boardId);
+        };
+        func_ajax(_viewData);
+    }
+
+    function load_board_detail(boardId){
         let _data = new Map();
         _data.url = "/api/board";
         _data.type = "GET";
         _data.param = {'id': boardId};
-        _data.success = function (obj_data, obj_status, obj_xhr) {
+        _data.success = function (obj_data) {
+            currentBoardData = obj_data || {};
             listenerAfterDetail(obj_data, "board");
-            currentBoardId = boardId;
-            currentBoardViewCount = parseInt(obj_data.countread, 10);
-            if (!Number.isFinite(currentBoardViewCount)) {
-                currentBoardViewCount = null;
-            }
-            render_board_extras(obj_data || {});
+            render_board_extras(currentBoardData);
             render_board_comments(boardId);
-        }
-        _data.error = function (obj_data, obj_status, obj_xhr) {
+        };
+        _data.error = function () {
             alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
-        }
+        };
         func_ajax(_data);
+    }
+
+    function get_board_like_state(){
+        if(!currentBoardId){
+            return false;
+        }
+        return localStorage.getItem(boardLikeStoragePrefix + currentBoardId) === "1";
+    }
+
+    function set_board_like_state(liked){
+        if(!currentBoardId){
+            return;
+        }
+        if(liked){
+            localStorage.setItem(boardLikeStoragePrefix + currentBoardId, "1");
+        } else {
+            localStorage.removeItem(boardLikeStoragePrefix + currentBoardId);
+        }
     }
 </script>
 </body>

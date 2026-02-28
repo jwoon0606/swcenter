@@ -2,6 +2,7 @@
 <html lang="ko">
 <th:block th:replace="~{includes/user/head}" />
 <link rel="stylesheet" href="/frontswcenter/css/aside.css">
+<link rel="stylesheet" href="/frontswcenter/css/introduction.css">
 <body>
 
 <th:block th:replace="~{includes/user/header}" />
@@ -10,15 +11,27 @@
     <th:block th:replace="~{includes/user/aside}" />
     <script> listener_aside_nav_active("introduction", 4); </script>
 
-    <main class="content-area">
-        <h1 class="page-title">오시는길</h1>
+    <main class="content-area mission-content-area">
 
-        <div class="content-box">
-            여기에 "오시는길" 본문 내용을 넣으면 됩니다!
-            <br><br>
-            이미지나 표 영역이 들어가요.
+        <div class="intro-legacy-subtitle-row">
+            <img class="intro-legacy-subtitle-bullet" src="/frontswcenter/img/content/title_1.png" alt="">
+            <span class="intro-legacy-subtitle-text">오시는 길</span>
         </div>
 
+        <div class="location-simple-map">
+            <iframe
+                    class="map-embed-frame"
+                    title="한동대학교 SW중심대학사업단 위치"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    src="https://maps.google.com/maps?q=%ED%95%9C%EB%8F%99%EB%8C%80%ED%95%99%EA%B5%90%20%EB%89%B4%ED%84%B4%ED%99%80&t=&z=16&ie=UTF8&iwloc=&output=embed">
+            </iframe>
+        </div>
+
+        <div class="location-simple-info">
+            <p>📍 37554 경북 포항시 북구 흥해읍 한동로 558 한동대학교 뉴턴홀 218호 소프트웨어중심대학사업단</p>
+            <p>☎ TEL. 054-260-1476~1480, FAX 054-260-1489</p>
+        </div>
     </main>
 </div>
 

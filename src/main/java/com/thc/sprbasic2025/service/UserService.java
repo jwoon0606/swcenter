@@ -8,6 +8,7 @@ import java.util.List;
 
 @Service
 public interface UserService {
+    String google(String idTokenString);
     boolean nick(UserDto.NickReqDto param, Long reqUserId);
     DefaultDto.CreateResDto signup(UserDto.CreateReqDto param, Long reqUserId);
     /**/

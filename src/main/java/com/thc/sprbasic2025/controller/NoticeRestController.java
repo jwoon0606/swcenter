@@ -75,6 +75,63 @@ public class NoticeRestController {
         return ResponseEntity.ok(noticeService.detail(params, reqUserId));
     }
 
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/view")
+    public ResponseEntity<NoticeDto.MetricsResDto> view(@RequestBody DefaultDto.DetailReqDto params
+            , @AuthenticationPrincipal PrincipalDetails principalDetails){
+        Long reqUserId = getReqUserId(principalDetails);
+        return ResponseEntity.ok(noticeService.increaseViewCount(params, reqUserId));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/like")
+    public ResponseEntity<NoticeDto.MetricsResDto> like(@RequestBody NoticeDto.LikeReqDto params
+            , @AuthenticationPrincipal PrincipalDetails principalDetails){
+        Long reqUserId = getReqUserId(principalDetails);
+        return ResponseEntity.ok(noticeService.updateLikeCount(params, reqUserId));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/comment/list")
+    public ResponseEntity<List<NoticeDto.CommentResDto>> commentList(DefaultDto.DetailReqDto params
+            , @AuthenticationPrincipal PrincipalDetails principalDetails){
+        Long reqUserId = getReqUserId(principalDetails);
+        return ResponseEntity.ok(noticeService.listComments(params, reqUserId));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/comment")
+    public ResponseEntity<NoticeDto.CommentResDto> comment(@RequestBody NoticeDto.CommentCreateReqDto params
+            , @AuthenticationPrincipal PrincipalDetails principalDetails){
+        Long reqUserId = getReqUserId(principalDetails);
+        return ResponseEntity.ok(noticeService.createComment(params, reqUserId));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping("/comment")
+    public ResponseEntity<NoticeDto.CommentResDto> commentUpdate(@RequestBody NoticeDto.CommentUpdateReqDto params
+            , @AuthenticationPrincipal PrincipalDetails principalDetails){
+        Long reqUserId = getReqUserId(principalDetails);
+        return ResponseEntity.ok(noticeService.updateComment(params, reqUserId));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @DeleteMapping("/comment")
+    public ResponseEntity<Void> commentDelete(@RequestBody DefaultDto.DeleteReqDto params
+            , @AuthenticationPrincipal PrincipalDetails principalDetails){
+        Long reqUserId = getReqUserId(principalDetails);
+        noticeService.deleteComment(params, reqUserId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/report")
+    public ResponseEntity<Boolean> report(@RequestBody NoticeDto.ReportReqDto params
+            , @AuthenticationPrincipal PrincipalDetails principalDetails){
+        Long reqUserId = getReqUserId(principalDetails);
+        return ResponseEntity.ok(noticeService.report(params, reqUserId));
+    }
+
     //@PreAuthorize("permitAll()")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/list")

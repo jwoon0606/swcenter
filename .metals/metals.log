@@ -229,3 +229,153 @@ Caused by: java.io.IOException: error=13, Permission denied
 2026.01.18 17:40:57 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/ExternalProperties.java. Using fallback presentation compiler.
 2026.01.18 17:40:57 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/ExternalProperties.java. Using fallback presentation compiler.
 2026.01.18 17:41:04 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/controller/page/ValueSpreadController.java. Using fallback presentation compiler.
+2026.01.19 06:29:05 INFO  Shutting down server
+2026.01.19 06:29:05 INFO  shutting down Metals
+2026.01.19 06:29:05 INFO  Exiting server
+2026.02.27 10:10:09 INFO  Started: Metals version 1.6.5 in folders '/Users/sw/Documents/workspace/swcenter' for client Visual Studio Code 1.109.5.
+2026.02.27 10:10:09 INFO  Memory monitor started
+2026.02.27 10:10:11 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.02.27 10:10:11 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/UserRepository.java. Using fallback presentation compiler.
+2026.02.27 10:10:12 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/UserRepository.java. Using fallback presentation compiler.
+2026.02.27 10:10:17 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/UserRepository.java
+2026.02.27 10:10:17 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/UserRepository.java. Using fallback presentation compiler.
+2026.02.27 10:11:04 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/UserRepository.java. Using fallback presentation compiler.
+2026.02.27 10:11:04 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java
+2026.02.27 10:11:04 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.02.27 10:11:04 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.02.27 10:11:04 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.02.27 10:11:13 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.02.27 10:11:18 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.02.27 10:11:29 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.02.27 10:11:29 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.02.27 10:11:29 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.02.27 10:11:33 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.02.27 10:12:58 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.02.27 10:12:58 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/HttpClientSender.java
+2026.02.27 10:12:58 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/HttpClientSender.java. Using fallback presentation compiler.
+2026.02.27 10:12:58 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/HttpClientSender.java. Using fallback presentation compiler.
+2026.02.27 10:12:58 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/HttpClientSender.java. Using fallback presentation compiler.
+2026.02.27 10:12:59 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/GithubCommitsByToken.java
+2026.02.27 10:12:59 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/GithubCommitsByToken.java. Using fallback presentation compiler.
+2026.02.27 10:12:59 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/GithubCommitsByToken.java. Using fallback presentation compiler.
+2026.02.27 10:12:59 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/GithubCommitsByToken.java. Using fallback presentation compiler.
+2026.02.27 10:13:01 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/GithubCommitsByToken.java. Using fallback presentation compiler.
+2026.02.27 10:13:05 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/GithubCommitsByToken.java. Using fallback presentation compiler.
+2026.02.27 10:13:07 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/HttpClientSender.java
+2026.02.27 10:13:07 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/HttpClientSender.java. Using fallback presentation compiler.
+2026.02.27 10:13:07 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/HttpClientSender.java. Using fallback presentation compiler.
+2026.02.27 10:13:07 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/HttpClientSender.java. Using fallback presentation compiler.
+2026.02.27 10:13:07 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/HttpClientSender.java. Using fallback presentation compiler.
+2026.02.27 10:13:12 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/HttpClientSender.java. Using fallback presentation compiler.
+2026.02.27 10:13:12 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/UserRepository.java
+2026.02.27 10:13:12 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/UserRepository.java. Using fallback presentation compiler.
+2026.02.27 10:13:12 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/UserRepository.java. Using fallback presentation compiler.
+2026.02.27 10:13:13 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/UserRepository.java. Using fallback presentation compiler.
+2026.02.27 10:13:14 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/ExternalProperties.java
+2026.02.27 10:13:14 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/ExternalProperties.java. Using fallback presentation compiler.
+2026.02.27 10:13:14 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/ExternalProperties.java. Using fallback presentation compiler.
+2026.02.27 10:13:14 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/ExternalProperties.java. Using fallback presentation compiler.
+2026.02.27 10:13:16 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/UserRepository.java. Using fallback presentation compiler.
+2026.02.27 10:13:16 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/JwtAuthorizationFilter.java
+2026.02.27 10:13:16 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/JwtAuthorizationFilter.java. Using fallback presentation compiler.
+2026.02.27 10:13:16 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/JwtAuthorizationFilter.java. Using fallback presentation compiler.
+2026.02.27 10:13:16 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/JwtAuthorizationFilter.java. Using fallback presentation compiler.
+2026.02.27 10:13:17 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/JwtAuthorizationFilter.java. Using fallback presentation compiler.
+2026.02.27 10:13:16 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/JwtAuthorizationFilter.java. Using fallback presentation compiler.
+2026.02.27 10:13:25 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/JwtAuthorizationFilter.java. Using fallback presentation compiler.
+2026.02.27 10:13:25 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PopupServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:25 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PopupServiceimpl.java
+2026.02.27 10:13:25 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PopupServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:25 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PopupServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:26 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java
+2026.02.27 10:13:25 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:26 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:27 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:27 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:29 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:29 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java
+2026.02.27 10:13:29 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:29 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:30 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:29 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:31 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:31 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java
+2026.02.27 10:13:31 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:32 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:32 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:31 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:31 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:32 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java
+2026.02.27 10:13:32 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:33 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:33 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:38 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java. Using fallback presentation compiler.
+2026.02.27 10:13:38 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/BoardRepository.java
+2026.02.27 10:13:38 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/BoardRepository.java. Using fallback presentation compiler.
+2026.02.27 10:13:38 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/BoardRepository.java. Using fallback presentation compiler.
+2026.02.27 10:13:38 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/BoardRepository.java. Using fallback presentation compiler.
+2026.02.27 10:13:48 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/BoardRepository.java. Using fallback presentation compiler.
+2026.02.27 11:38:51 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/ExternalProperties.java
+2026.02.27 11:38:51 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/ExternalProperties.java. Using fallback presentation compiler.
+2026.02.27 11:38:51 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/ExternalProperties.java. Using fallback presentation compiler.
+2026.02.27 11:38:52 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/ExternalProperties.java. Using fallback presentation compiler.
+2026.02.27 11:42:52 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/GithubCommitsByToken.java
+2026.02.27 11:42:52 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/GithubCommitsByToken.java. Using fallback presentation compiler.
+2026.02.27 11:42:52 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/GithubCommitsByToken.java. Using fallback presentation compiler.
+2026.02.27 11:42:53 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/GithubCommitsByToken.java. Using fallback presentation compiler.
+2026.02.27 11:42:52 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/GithubCommitsByToken.java. Using fallback presentation compiler.
+2026.02.27 11:54:45 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/GithubCommitsByToken.java. Using fallback presentation compiler.
+2026.02.27 11:54:45 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/GithubCommitsByToken.java
+2026.02.27 11:54:45 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/GithubCommitsByToken.java. Using fallback presentation compiler.
+2026.02.27 11:54:45 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/util/GithubCommitsByToken.java. Using fallback presentation compiler.
+2026.02.27 14:21:00 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/NoticeCommentRepository.java. Using fallback presentation compiler.
+2026.02.27 14:21:00 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/NoticeCommentRepository.java
+2026.02.27 14:21:00 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/NoticeCommentRepository.java. Using fallback presentation compiler.
+2026.02.27 14:21:00 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/NoticeCommentRepository.java. Using fallback presentation compiler.
+2026.02.27 14:21:02 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/NoticeCommentRepository.java. Using fallback presentation compiler.
+2026.02.27 14:21:11 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/NoticeCommentRepository.java. Using fallback presentation compiler.
+2026.02.27 14:21:32 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/NoticeCommentRepository.java
+2026.02.27 14:21:32 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/NoticeCommentRepository.java. Using fallback presentation compiler.
+2026.02.27 14:21:32 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/NoticeCommentRepository.java. Using fallback presentation compiler.
+2026.02.27 14:21:32 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/NoticeCommentRepository.java. Using fallback presentation compiler.
+2026.02.27 14:21:44 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/repository/NoticeCommentRepository.java. Using fallback presentation compiler.
+2026.02.28 21:53:52 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:53:52 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java
+2026.02.28 21:53:52 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:53:52 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:53:53 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:19 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:50 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionuserServiceimpl.java
+2026.02.28 21:55:50 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionuserServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:50 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionuserServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:50 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionuserServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:50 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java
+2026.02.28 21:55:50 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:51 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:52 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:52 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:54 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:54 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java
+2026.02.28 21:55:54 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:54 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:54 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:54 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:54 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:56 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermittedServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:56 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java
+2026.02.28 21:55:56 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:56 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:57 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:55:58 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:56:00 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:56:08 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/UserServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:56:08 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java
+2026.02.28 21:56:08 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:56:08 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:56:08 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:56:08 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:56:11 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/PermissionServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:56:11 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/NewsletterServiceimpl.java
+2026.02.28 21:56:11 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/NewsletterServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:56:11 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/NewsletterServiceimpl.java. Using fallback presentation compiler.
+2026.02.28 21:56:12 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/service/impl/NewsletterServiceimpl.java. Using fallback presentation compiler.

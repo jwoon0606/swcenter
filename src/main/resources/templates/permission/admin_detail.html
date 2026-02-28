@@ -36,6 +36,7 @@
     <tr class="gradeA" id="tr_permissionuser_{{id}}">
         <td><font class="font_permissionuser_order">-</font></td>
         <td>{{userUsername}}</td>
+        <td>{{userEmail}}</td>
         <td><button class="btn btn-danger btn-sm" onclick="delete_permissionuser('{{id}}')">삭제</button></td>
     </tr>
     {{/resultData_permissionuser}}
@@ -67,9 +68,14 @@
 
                 <!-- Page Heading -->
                 <h1 class="h3 mb-2 text-gray-800">권한 : <span class="font_permission_title">-</span> </h1>
-                <p class="mb-4">권한 상세 입니다.</p>
+                <p class="mb-2">권한 상세 입니다.</p>
 
                 <div class="mb-4">
+                    <div class="mb-3">
+                        <button class="btn btn-outline-secondary btn-sm mr-1" onclick="apply_permission_preset('student'); return false;">일반학생 프리셋</button>
+                        <button class="btn btn-outline-primary btn-sm mr-1" onclick="apply_permission_preset('content'); return false;">콘텐츠관리자 프리셋</button>
+                        <button class="btn btn-outline-danger btn-sm" onclick="apply_permission_preset('super'); return false;">슈퍼관리자 프리셋</button>
+                    </div>
                     <div class="form-group row">
                         <input type="hidden" id="detail_permission_id" />
 
@@ -126,7 +132,8 @@
                                 <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>사용자ID</th>
+                                    <th>아이디</th>
+                                    <th>이메일</th>
                                     <th>/</th>
                                 </tr>
                                 </thead>
@@ -164,9 +171,9 @@
                 </button>
             </div>
             <div class="modal-body">
-                <label class="col-form-label">*사용자id</label>
+                <label class="col-form-label">*이메일</label>
                 <div>
-                    <input type="text" class="form-control m-b input_required" id="create_permissionuser_username" keyword="username" placeholder="내용을 입력하세요" />
+                    <input type="text" class="form-control m-b input_required" id="create_permissionuser_username" keyword="username" placeholder="이메일을 입력하세요" />
                 </div>
             </div>
             <div class="modal-footer">
@@ -288,6 +295,88 @@
             }
         }
         $("#input_chk_each_" + obj_target + "_0").prop("checked", isOn);
+    }
+
+    function preset_map(){
+        return {
+            student: [
+                {target: "notice", func: 200},
+                {target: "board", func: 200},
+                {target: "news_letter", func: 200},
+                {target: "extracurricular_activities", func: 200}
+            ],
+            content: [
+                {target: "notice", func: 110}, {target: "notice", func: 120}, {target: "notice", func: 200},
+                {target: "board", func: 110}, {target: "board", func: 120}, {target: "board", func: 200},
+                {target: "support_project", func: 110}, {target: "support_project", func: 120}, {target: "support_project", func: 200},
+                {target: "news_letter", func: 200},
+                {target: "extracurricular_activities", func: 200}
+            ],
+            super: [
+                {target: "admin", func: 200},
+                {target: "permission", func: 110}, {target: "permission", func: 120}, {target: "permission", func: 200},
+                {target: "user", func: 110}, {target: "user", func: 120}, {target: "user", func: 200},
+                {target: "notice", func: 110}, {target: "notice", func: 120}, {target: "notice", func: 200},
+                {target: "board", func: 110}, {target: "board", func: 120}, {target: "board", func: 200},
+                {target: "support_project", func: 110}, {target: "support_project", func: 120}, {target: "support_project", func: 200},
+                {target: "news_letter", func: 200},
+                {target: "extracurricular_activities", func: 200}
+            ]
+        };
+    }
+
+    function apply_permission_preset(presetName){
+        if(!confirm("프리셋을 적용하시겠습니까? 기존 체크 상태가 변경됩니다.")){
+            return;
+        }
+        let permissionId = getIdFromUrl(null);
+        let all = [];
+        let targets = ["admin", "permission", "user", "notice", "board", "support_project", "news_letter", "extracurricular_activities"];
+        let funcs = [110, 120, 200];
+        let selected = preset_map()[presetName] || [];
+        let selectedMap = {};
+        for (let each of selected){
+            selectedMap[each.target + "_" + each.func] = true;
+        }
+
+        for (let t of targets){
+            for (let f of funcs){
+                all.push({
+                    target: t,
+                    func: f,
+                    alive: !!selectedMap[t + "_" + f]
+                });
+            }
+        }
+
+        let remain = all.length;
+        let failed = false;
+        for (let each of all){
+            let _data = {};
+            _data.url = "/api/permissiondetail/toggle";
+            _data.type = "POST";
+            _data.param = {
+                permissionId: permissionId,
+                target: each.target,
+                func: each.func,
+                alive: each.alive
+            };
+            _data.success = function(){
+                remain -= 1;
+                if(remain === 0 && !failed){
+                    alert("프리셋 적용 완료");
+                    location.reload();
+                }
+            };
+            _data.error = function(){
+                remain -= 1;
+                failed = true;
+                if(remain === 0){
+                    alert("프리셋 적용 중 오류가 발생했습니다.");
+                }
+            };
+            func_ajax(_data);
+        }
     }
 
     function update_permission(obj_this){

@@ -19,12 +19,16 @@ public class Notice extends AuditingFields{
     String title;
     String content;
     String img;
+    Integer viewCount;
+    Integer likeCount;
 
     protected Notice(){}
     private Notice(String title, String content, String img){
         this.title = title;
         this.content = content;
         this.img = img;
+        this.viewCount = 0;
+        this.likeCount = 0;
     }
     public static Notice of(String title, String content, String img){
         return new Notice(title, content, img);
@@ -38,5 +42,7 @@ public class Notice extends AuditingFields{
         if(param.getTitle() != null){ setTitle(param.getTitle()); }
         if(param.getContent() != null){ setContent(param.getContent()); }
         if(param.getImg() != null){ setImg(param.getImg()); }
+        if(param.getViewCount() != null){ setViewCount(param.getViewCount()); }
+        if(param.getLikeCount() != null){ setLikeCount(param.getLikeCount()); }
     }
 }

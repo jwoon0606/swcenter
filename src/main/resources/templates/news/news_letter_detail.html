@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<th:block th:replace="~{includes/user/head}" />
+<link rel="stylesheet" href="/frontswcenter/css/aside.css">
+<body>
+
+<th:block th:replace="~{includes/user/header}" />
+
+<div class="page-layout">
+    <th:block th:replace="~{includes/user/aside}" />
+    <script> listener_aside_nav_active("news", 2); </script>
+
+    <main class="content-area">
+        <div class="content-box">
+            상세 페이지로 이동중입니다.
+            <br>
+            이동하지 않으면 <a id="newsletter_detail_fallback" href="https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html" target="_blank" rel="noopener noreferrer">여기를 클릭</a>해 주세요.
+        </div>
+    </main>
+</div>
+
+<th:block th:replace="~{includes/user/footer}" />
+<th:block th:replace="~{includes/user/bottom}" />
+
+<script>
+    const NEWSLETTER_DEFAULT_DETAIL_URL = "https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html";
+
+    $(function(){
+        let newsletterId = get_newsletter_id_from_path();
+        if (newsletterId == null) {
+            redirect_newsletter_detail(NEWSLETTER_DEFAULT_DETAIL_URL);
+            return;
+        }
+
+        let _data = new Map();
+        _data.url = "/api/newsletter";
+        _data.type = "GET";
+        _data.param = { id: newsletterId };
+        _data.success = function(row){
+            let targetUrl = row && row.detailUrl ? row.detailUrl : NEWSLETTER_DEFAULT_DETAIL_URL;
+            redirect_newsletter_detail(targetUrl);
+        };
+        _data.error = function(){
+            redirect_newsletter_detail(NEWSLETTER_DEFAULT_DETAIL_URL);
+        };
+        func_ajax(_data);
+    });
+
+    function get_newsletter_id_from_path() {
+        let match = window.location.pathname.match(/\/news_letter\/detail\/(\d+)/);
+        if (!match || match.length < 2) {
+            return null;
+        }
+        return Number(match[1]);
+    }
+
+    function redirect_newsletter_detail(url) {
+        $("#newsletter_detail_fallback").attr("href", url);
+        window.location.replace(url);
+    }
+</script>
+
+</body>
+</html>

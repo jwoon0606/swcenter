@@ -9,6 +9,7 @@
 			 , user.created_at as createdAt
 			 , user.modified_at as modifiedAt
 			 , user.username
+			 , user.email
 			 , user.code
 			 , user.name
 			 , user.nick
@@ -29,7 +30,7 @@
 		<if test="sdate != null and sdate != ''">AND user.created_at >= CONCAT(#{sdate}, ' 00:00:00')</if>
 		<if test="fdate != null and fdate != ''">AND CONCAT(#{fdate}, ' 23:59:59') >= user.created_at</if>
 		<if test = "code != null and code !=''">AND user.code = #{code}</if>
-		<if test = "name != null and name !=''">AND user.name LIKE CONCAT('%', #{name}, '%')</if>
+		<if test = "email != null and email !=''">AND user.email LIKE CONCAT('%', #{email}, '%')</if>
 		<if test = "birthyear != null and birthyear !=''">AND user.birthyear = #{birthyear}</if>
 		<if test = "gender != null and gender !=''">AND user.gender = #{gender}</if>
 		<if test = "region != null and region !=''">AND user.region = #{region}</if>
@@ -54,7 +55,7 @@
 		<include refid="commonWhere"/>
 
 		<if test = "orderby != null and orderby =='id'">ORDER BY user.id </if>
-		<if test = "orderby != null and orderby =='name'">ORDER BY user.name </if>
+		<if test = "orderby != null and orderby =='email'">ORDER BY user.email </if>
 		<if test = "orderway != null and orderway =='DESC'"> DESC</if>
 		<if test = "orderway != null and orderway =='ASC'"> ASC</if>
 		LIMIT #{offset}, #{perpage}

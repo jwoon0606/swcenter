@@ -2,6 +2,7 @@
 <html lang="ko">
 <th:block th:replace="~{includes/user/head}" />
 <link rel="stylesheet" href="/frontswcenter/css/aside.css">
+<link rel="stylesheet" href="/frontswcenter/css/introduction.css">
 <body>
 
 <th:block th:replace="~{includes/user/header}" />
@@ -10,13 +11,10 @@
     <th:block th:replace="~{includes/user/aside}" />
     <script> listener_aside_nav_active("value-spread", 2); </script>
 
-    <main class="content-area">
-        <h1 class="page-title">운영 현황</h1>
+    <main class="content-area mission-content-area">
 
-        <div class="content-box">
-            여기에 "운영 현황" 본문 내용을 넣으면 됩니다!
-            <br><br>
-            이미지나 표 영역이 들어가요.
+        <div class="content_img">
+            <img id="content_imgId" src="/frontswcenter/img/content/sw_val_update_2021_3.png" style="width: 100%;" alt="운영 현황 이미지">
         </div>
 
     </main>

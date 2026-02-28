@@ -4,55 +4,48 @@
 <link rel="stylesheet" href="/frontswcenter/css/aside.css">
 <body>
 
-<script id="list_info_board" type="text/x-handlebars-template">
-    {{#resultData_board}}
-    <tr class="gradeA">
-        <td><font class="font_board_order"></font></td>
-        <td class="cursor_pointer" onclick="location.href='/board/detail/{{id}}';">{{title}}</td>
-        <td>{{createdAt}}
-            <input type="hidden" class="input_cursor_board_id" value="{{id}}"/>
-        </td>
-        <td class="text-center">{{viewCount}}</td>
-        <td class="text-center">{{likeCount}}</td>
-    </tr>
-    {{/resultData_board}}
-</script>
-<script type="text/javascript">
-    var list_info_board = $("#list_info_board").html();
-    var list_info_board_template = Handlebars.compile(list_info_board);
-</script>
-
 <th:block th:replace="~{includes/user/header}" />
 
 <div class="page-layout">
     <th:block th:replace="~{includes/user/aside}" />
     <script> listener_aside_nav_active("board", 1); </script>
 
-
-    <main class="content-area list-page">
-        <div class="content-header">
-            <h1 class="page-title">일반게시판</h1>
-            <div class="content-actions">
-                <button class="primary-button" id="board_write_button" onclick="location.href='/board/create'; return false;">글쓰기</button>
+    <main class="content-area list-page board-list-page">
+        <div class="board-list-tools">
+            <div class="board-search-box">
+                <input type="text" id="board_keyword" placeholder="제목 검색" aria-label="게시글 제목 검색" />
+                <button type="button" id="board_search_button" aria-label="검색" onclick="submit_board_search(); return false;"></button>
+            </div>
+            <div class="board-filter-box">
+                <select id="board_subject_filter" aria-label="주제 필터">
+                    <option value="">All</option>
+                    <option value="일상">일상</option>
+                    <option value="자유">자유</option>
+                    <option value="고민">고민</option>
+                </select>
             </div>
         </div>
 
-        <div class="content-box">
-            <table class="table list-table" id="dataTable">
+        <div class="board-table-box">
+            <table class="board-table" id="dataTable">
                 <thead>
                 <tr>
-                    <th>번호</th>
+                    <th>주제</th>
                     <th>제목</th>
+                    <th>작성자</th>
                     <th>작성일</th>
-                    <th>조회수</th>
-                    <th>좋아요</th>
                 </tr>
                 </thead>
-                <tbody id="tbody_board_list">
-                </tbody>
+                <tbody id="tbody_board_list"></tbody>
             </table>
         </div>
 
+        <div class="board-list-footer">
+            <button class="primary-button board-write-button" id="board_write_button" onclick="location.href='/board/create'; return false;">
+                글 작성
+            </button>
+            <div class="board-pagination" id="board_pagination"></div>
+        </div>
     </main>
 
 </div>
@@ -61,48 +54,251 @@
 <th:block th:replace="~{includes/user/bottom}" />
 
 <script>
-    $(function(){
-        console.log( "ready!" );
-        search_board();
-        if (!listener_is_login()) {
+    const BOARD_PAGE_SIZE = 10;
+    const BOARD_PAGE_BLOCK = 5;
+
+    const boardState = {
+        callpage: 1,
+        totalpage: 1,
+        keyword: "",
+        subject: ""
+    };
+
+    $(function () {
+        bind_board_events();
+        if (!is_board_user_logged_in()) {
             $("#board_write_button").hide();
         }
+        load_board_page(1);
     });
-    function listener_board_keyword_changed(){
-        $("#input_board_keyword_changed").val("1");
-        $("#tbody_board_list").html("");
-        search_board();
+
+    function is_board_user_logged_in() {
+        const refreshToken = localStorage.getItem("refreshToken");
+        return !(refreshToken == null || String(refreshToken).trim() === "");
     }
-    function search_board() {
-        let _data = new Map();
-        _data.url = "/api/board/scrollList";
-        _data.type = "GET";
-        _data.param = {
-            perpage: 10
-            , orderby: "id"
-            , orderway: "DESC"
-            , cursor: listenerGetCursor("board")
-            , deleted: false
-        };
-        _data.success = function (obj_data, obj_status, obj_xhr) {
-            /*let input_board_keyword_changed = $("#input_board_keyword_changed").val();
-            if(input_board_keyword_changed === "1"){
-                $("#input_board_keyword_changed").val("");
-            }*/
-            let tempList = obj_data;
-            for (let each of tempList) {
-                each.viewCount = each.viewCount || 0;
-                each.likeCount = each.likeCount || 0;
-                let tList = [];
-                tList.push(each);
-                $("#tbody_board_list").append(list_info_board_template({"resultData_board": tList}));
+
+    function bind_board_events() {
+        $("#board_keyword").on("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                submit_board_search();
             }
-            listenerAfterScrollList("board");
+        });
+
+        $("#board_subject_filter").on("change", function () {
+            boardState.subject = ($(this).val() || "").trim();
+            load_board_page(1);
+        });
+
+        $("#board_pagination").on("click", "button[data-page]", function () {
+            const nextPage = parseInt($(this).attr("data-page"), 10);
+            if (!Number.isFinite(nextPage) || nextPage < 1 || nextPage === boardState.callpage) {
+                return;
+            }
+            load_board_page(nextPage);
+        });
+    }
+
+    function submit_board_search() {
+        boardState.keyword = ($("#board_keyword").val() || "").trim();
+        boardState.subject = ($("#board_subject_filter").val() || "").trim();
+        load_board_page(1);
+    }
+
+    function load_board_page(pageNo) {
+        const safePage = Number.isFinite(pageNo) && pageNo > 0 ? pageNo : 1;
+        boardState.callpage = safePage;
+
+        const requestParam = {
+            perpage: BOARD_PAGE_SIZE,
+            callpage: safePage,
+            orderby: "id",
+            orderway: "DESC",
+            deleted: false
+        };
+
+        if (boardState.keyword !== "") {
+            requestParam.title = boardState.keyword;
         }
-        _data.error = function (obj_data, obj_status, obj_xhr) {
-            alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
+        if (boardState.subject !== "") {
+            requestParam.subject = boardState.subject;
         }
-        func_ajax(_data);
+
+        $.ajax({
+            url: "/api/board/pagedList",
+            type: "GET",
+            data: requestParam,
+            success: function (obj_data) {
+                const list = (obj_data && Array.isArray(obj_data.list)) ? obj_data.list : [];
+                let totalPage = parseInt(obj_data && obj_data.totalpage, 10);
+                if (!Number.isFinite(totalPage) || totalPage < 1) {
+                    totalPage = 1;
+                }
+
+                boardState.totalpage = totalPage;
+                if (boardState.callpage > boardState.totalpage) {
+                    boardState.callpage = boardState.totalpage;
+                }
+
+                sync_subject_options(list);
+                render_board_rows(list);
+                render_board_pagination();
+            },
+            error: function () {
+                alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
+            }
+        });
+    }
+
+    function render_board_rows(list) {
+        const $tbody = $("#tbody_board_list");
+        $tbody.html("");
+
+        if (!list || list.length === 0) {
+            const $emptyTr = $(document.createElement("tr"));
+            $(document.createElement("td"))
+                .addClass("board-empty-row")
+                .attr("colspan", "4")
+                .text("등록된 게시글이 없습니다.")
+                .appendTo($emptyTr);
+            $tbody.append($emptyTr);
+            return;
+        }
+
+        for (const item of list) {
+            const subject = get_board_subject(item);
+            const title = get_board_title(item);
+            const writer = is_board_anonymous(item) ? "익명" : (item.userNick || item.userUsername || "익명");
+            const createdDate = format_board_date(item.createdAt);
+
+            const $tr = $(document.createElement("tr"));
+            $(document.createElement("td"))
+                .addClass("board-subject-cell")
+                .text("[" + subject + "]")
+                .appendTo($tr);
+
+            const $titleCell = $(document.createElement("td"));
+            const $titleLink = $(document.createElement("a"))
+                .attr("href", "#")
+                .addClass("board-title-link")
+                .text(title)
+                .on("click", function (event) {
+                    event.preventDefault();
+                    location.href = "/board/detail/" + item.id;
+                });
+            $titleCell.append($titleLink).appendTo($tr);
+
+            $(document.createElement("td")).addClass("board-writer-cell").text(String(writer).trim()).appendTo($tr);
+            $(document.createElement("td")).addClass("board-date-cell").text(createdDate).appendTo($tr);
+
+            $tbody.append($tr);
+        }
+    }
+
+    function render_board_pagination() {
+        const $pagination = $("#board_pagination");
+        $pagination.html("");
+
+        const current = boardState.callpage;
+        const total = boardState.totalpage;
+        const start = Math.floor((current - 1) / BOARD_PAGE_BLOCK) * BOARD_PAGE_BLOCK + 1;
+        const end = Math.min(start + BOARD_PAGE_BLOCK - 1, total);
+
+        append_page_button($pagination, "<", Math.max(1, current - 1), current === 1, false);
+        for (let page = start; page <= end; page += 1) {
+            append_page_button($pagination, String(page), page, false, page === current);
+        }
+        append_page_button($pagination, ">", Math.min(total, current + 1), current === total, false);
+    }
+
+    function append_page_button($target, text, page, disabled, active) {
+        const $button = $(document.createElement("button"))
+            .attr("type", "button")
+            .text(text)
+            .attr("data-page", page)
+            .prop("disabled", !!disabled);
+
+        if (active) {
+            $button.addClass("is-active");
+        }
+        if (disabled) {
+            $button.addClass("is-disabled");
+        }
+
+        $target.append($button);
+    }
+
+    function sync_subject_options(list) {
+        const $select = $("#board_subject_filter");
+        const selectedValue = ($select.val() || "").trim();
+        const exists = {};
+
+        $select.find("option").each(function () {
+            exists[$(this).val()] = true;
+        });
+
+        for (const item of list) {
+            const subject = get_board_subject(item);
+            if (subject !== "" && !exists[subject]) {
+                exists[subject] = true;
+                $select.append($(document.createElement("option")).val(subject).text(subject));
+            }
+        }
+
+        $select.val(selectedValue);
+    }
+
+    function parse_subject_and_title(rawTitle) {
+        const fullTitle = (rawTitle == null ? "" : String(rawTitle)).trim();
+        if (fullTitle.startsWith("[")) {
+            const closeIdx = fullTitle.indexOf("]");
+            if (closeIdx > 1) {
+                const subject = fullTitle.substring(1, closeIdx).trim() || "자유";
+                const title = fullTitle.substring(closeIdx + 1).trim() || fullTitle;
+                return { subject: subject, title: title };
+            }
+        }
+        return {
+            subject: "자유",
+            title: fullTitle || "-"
+        };
+    }
+
+    function get_board_subject(item) {
+        if (item && item.subject != null && String(item.subject).trim() !== "") {
+            return String(item.subject).trim();
+        }
+        return parse_subject_and_title(item ? item.title : "").subject;
+    }
+
+    function get_board_title(item) {
+        if (item && item.subject != null && String(item.subject).trim() !== "") {
+            const title = (item.title == null ? "" : String(item.title)).trim();
+            return title === "" ? "-" : title;
+        }
+        return parse_subject_and_title(item ? item.title : "").title;
+    }
+
+    function is_board_anonymous(item) {
+        return item != null && item.anonymous === true;
+    }
+
+    function format_board_date(value) {
+        if (value == null) {
+            return "-";
+        }
+
+        const raw = String(value).trim();
+        if (raw === "") {
+            return "-";
+        }
+
+        const datePart = raw.split("T")[0].split(" ")[0];
+        const parts = datePart.split("-");
+        if (parts.length === 3) {
+            return parts[0] + "." + parts[1] + "." + parts[2];
+        }
+        return datePart;
     }
 </script>
 </body>

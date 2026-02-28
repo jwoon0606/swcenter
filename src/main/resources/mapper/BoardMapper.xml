@@ -10,9 +10,14 @@
 			 , board.modified_at as modifiedAt
 
              , board.user_id as userId
+             , board.subject
+             , board.anonymous
 			 , board.title
 			 , board.content
+			 , board.img
 			 , board.countread
+			 , board.countread as viewCount
+             , board.like_count as likeCount
 
              , user.username as userUsername
              , user.nick as userNick
@@ -29,6 +34,12 @@
 		<if test = "deleted != null">AND board.deleted = #{deleted}</if>
 		<if test="sdate != null and sdate != ''">AND board.created_at >= CONCAT(#{sdate}, ' 00:00:00')</if>
 		<if test="fdate != null and fdate != ''">AND CONCAT(#{fdate}, ' 23:59:59') >= board.created_at</if>
+		<if test = "subject != null and subject !=''">
+			AND (
+				board.subject = #{subject}
+				OR (board.subject is null AND board.title LIKE CONCAT('%[', #{subject}, ']%'))
+			)
+		</if>
 		<if test = "title != null and title !=''">AND board.title LIKE CONCAT('%', #{title}, '%')</if>
 	</sql>
 

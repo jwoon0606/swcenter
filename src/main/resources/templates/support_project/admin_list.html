@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<th:block th:replace="~{includes/admin/head}" />
+
+<script id="list_info_support_project" type="text/x-handlebars-template">
+    {{#resultData_support_project}}
+    <tr class="gradeA">
+        <td>
+            <input class="input_chk_delete_support_project_each" type="checkbox" keyword="{{id}}" id="input_chk_delete_support_project_each_{{id}}" onclick="listener_chk_delete(this, 'support_project')" />
+        </td>
+        <td><font class="font_support_project_order"></font></td>
+        <td style="width:75px;">
+            <i class="cursor_pointer fa fa-arrow-up" onclick="update_support_project_sequence('{{id}}','up')"></i>
+            <i class="cursor_pointer fa fa-arrow-down" onclick="update_support_project_sequence('{{id}}','down')" style="float:right;"></i>
+        </td>
+        <td><font class="font_support_project_deleted_{{deleted}} chk_support_project_deleted_{{id}}">{{deleted}}</font></td>
+        <td class="cursor_pointer" onclick="location.href='/support_project/admin_detail/{{id}}';">{{title}}</td>
+        <td>{{publishedDate}}</td>
+        <td>{{createdAt}} / {{modifiedAt}}
+            <div class="hide">
+                <input class="input_cursor_support_project_id" value="{{id}}"/>
+            </div>
+        </td>
+    </tr>
+    {{/resultData_support_project}}
+</script>
+<script type="text/javascript">
+    var list_info_support_project = $("#list_info_support_project").html();
+    var list_info_support_project_template = Handlebars.compile(list_info_support_project);
+</script>
+
+<body id="page-top">
+
+<div id="wrapper">
+
+    <th:block th:replace="~{includes/admin/sidebar}" />
+    <script>
+        $(".nav_support_project_a").removeClass("collapsed");
+        $(".nav_support_project_div").addClass("show");
+    </script>
+
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <div id="content">
+
+            <th:block th:replace="~{includes/admin/topbar}" />
+
+            <div class="container-fluid">
+
+                <h1 class="h3 mb-2 text-gray-800">지원 프로젝트 목록</h1>
+                <p class="mb-4">전체 목록 조회입니다.</p>
+
+                <div class="mb-4">
+                    <div class="form-group row">
+                        <input type="hidden" id="input_support_project_keyword_changed" value=""/>
+
+                        <label class="col-sm-2 col-form-label">삭제여부</label>
+                        <div class="col-sm-4">
+                            <select class="select_search_support_project_keyword form-control mb-2" name="deleted" id="search_support_project_deleted" onchange="listener_support_project_keyword_changed()">
+                                <option value="" selected="selected">전체</option>
+                                <option value="false">일반</option>
+                                <option value="true">삭제</option>
+                            </select>
+                        </div>
+                        <label class="col-sm-6 col-form-label"></label>
+
+                        <label class="col-sm-2 col-form-label">등록 시기</label>
+                        <div class="col-sm-3">
+                            <input class="form-control mb-2" id="search_support_project_sdate" type="date" onchange="listener_support_project_keyword_changed()"/>
+                        </div>
+                        <div class="col-sm-3">
+                            <input class="form-control mb-2" id="search_support_project_fdate" type="date" onchange="listener_support_project_keyword_changed()"/>
+                        </div>
+                        <div class="col-sm-4">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="set_search_sdatefdate('null', 'support_project', listener_support_project_keyword_changed); return false;">초기화</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="set_search_sdatefdate('today', 'support_project', listener_support_project_keyword_changed); return false;">오늘</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="set_search_sdatefdate('week', 'support_project', listener_support_project_keyword_changed); return false;">1주</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="set_search_sdatefdate('month', 'support_project', listener_support_project_keyword_changed); return false;">1개월</button>
+                        </div>
+
+                        <label class="col-sm-2 col-form-label">키워드</label>
+                        <div class="col-sm-4">
+                            <select class="form-control mb-2" id="search_support_project_keyword" onchange="set_search_keyword('support_project')">
+                                <option value="10" selected="selected">이름</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <input id="search_support_project_title" onchange="listener_support_project_keyword_changed();"
+                                   class="form-control search_support_project_keyword_each search_support_project_keyword_each_10 mb-2" type="text" placeholder="내용을 입력하세요"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-100">
+                    <button class="btn btn-primary mb-2" onclick="location.href='/support_project/admin_create'; return false;">생성하기</button>
+                    <button class="btn btn-outline-secondary mb-2 ml-1" onclick="seed_support_project_samples(); return false;">샘플 데이터 생성</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered bg-white" id="dataTable">
+                        <thead>
+                        <tr>
+                            <th>
+                                <input class="input_chk_delete_support_project_all" type="checkbox" keyword="all" id="input_chk_delete_support_project_all" onclick="listener_chk_delete(this, 'support_project')" />
+                            </th>
+                            <th>#</th>
+                            <th>-</th>
+                            <th>삭제여부</th>
+                            <th>제목</th>
+                            <th>게시일</th>
+                            <th>입력일시/수정일시</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tbody_support_project_list">
+                        </tbody>
+                    </table>
+                    <div class="w-100 m-auto">
+                        <button class="btn btn-danger" onclick="delete_support_project(); return false;">삭제</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <th:block th:replace="~{includes/admin/footer}" />
+
+    </div>
+
+</div>
+
+<th:block th:replace="~{includes/admin/bottom}" />
+
+<script>
+    $(document).ready(function() {
+        search_support_project();
+    });
+</script>
+
+<script>
+    function listener_support_project_keyword_changed(){
+        $("#input_support_project_keyword_changed").val("1");
+        search_support_project();
+    }
+
+    function search_support_project() {
+        let _data = new Map();
+        _data.url = "/api/support_project/list";
+        _data.type = "GET";
+        _data.param = {
+            sdate: $("#search_support_project_sdate").val(),
+            fdate: $("#search_support_project_fdate").val(),
+            deleted: listenerGetBooleanFromSelect("search_support_project_deleted"),
+            title: $("#search_support_project_title").val()
+        };
+        _data.success = function (obj_data) {
+            let input_support_project_keyword_changed = $("#input_support_project_keyword_changed").val();
+            if(input_support_project_keyword_changed === "1"){
+                $("#input_support_project_keyword_changed").val("");
+            }
+            $("#tbody_support_project_list").html("");
+            let tempList = obj_data || [];
+            for (let each of tempList) {
+                let tList = [];
+                tList.push(each);
+                $("#tbody_support_project_list").append(list_info_support_project_template({"resultData_support_project": tList}));
+            }
+            listenerAfterScrollList("support_project");
+        }
+        _data.error = function () {
+            alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
+        }
+        func_ajax(_data);
+    }
+
+    function delete_support_project() {
+        if (!confirm("정말 삭제하시겠습니까?")) {
+            alert("취소");
+            return false;
+        }
+        let ids = listenerGetDeleteIds('support_project');
+        let _data = new Map();
+        _data.url = "/api/support_project/list";
+        _data.type = "DELETE";
+        _data.param = {
+            'ids' : ids
+        };
+        _data.success = function(){
+            search_support_project();
+        }
+        _data.error = function(){
+            alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
+        }
+        func_ajax(_data);
+    }
+
+    function update_support_project_sequence(obj_id, obj_way){
+        let _data = new Map();
+        _data.url = "/api/support_project/sequence";
+        _data.type = "PUT";
+        _data.param = {
+            'id' : obj_id,
+            'way' : (obj_way === "up")
+        };
+        _data.success = function(obj_data){
+            if(obj_data["result"]){
+                search_support_project();
+            } else {
+                alert("이동이 불가합니다.");
+            }
+        }
+        _data.error = function(){
+            alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
+        }
+        func_ajax(_data);
+    }
+
+    function seed_support_project_samples() {
+        if (!confirm("샘플 데이터를 생성하시겠습니까? 이미 있는 항목은 건너뜁니다.")) {
+            return false;
+        }
+        let _data = new Map();
+        _data.url = "/api/support_project/seedSamples";
+        _data.type = "POST";
+        _data.param = {};
+        _data.success = function(obj_data){
+            alert("생성 " + obj_data.createdCount + "건 / 전체 " + obj_data.totalCount + "건");
+            search_support_project();
+        };
+        _data.error = function(){
+            alert("샘플 데이터 생성 권한이 없거나 요청에 실패했습니다.");
+        };
+        func_ajax(_data);
+    }
+</script>
+
+</body>
+
+</html>

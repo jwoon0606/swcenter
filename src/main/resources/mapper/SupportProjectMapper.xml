@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thc.sprbasic2025.mapper.SupportProjectMapper">
+
+    <select id="detail" parameterType="hashMap" resultType="com.thc.sprbasic2025.dto.SupportProjectDto$DetailResDto">
+        SELECT support_project.id
+             , support_project.deleted
+             , support_project.created_at as createdAt
+             , support_project.modified_at as modifiedAt
+
+             , support_project.sequence
+             , support_project.title
+             , support_project.content
+             , support_project.url
+             , support_project.img
+             , support_project.published_date as publishedDate
+        FROM support_project
+        WHERE support_project.id = #{id}
+    </select>
+
+    <sql id="commonWhere">
+        WHERE support_project.id is not NULL
+        <if test = "deleted != null">AND support_project.deleted = #{deleted}</if>
+        <if test="sdate != null and sdate != ''">AND support_project.created_at >= CONCAT(#{sdate}, ' 00:00:00')</if>
+        <if test="fdate != null and fdate != ''">AND CONCAT(#{fdate}, ' 23:59:59') >= support_project.created_at</if>
+        <if test = "title != null and title !=''">AND support_project.title LIKE CONCAT('%', #{title}, '%')</if>
+    </sql>
+
+    <select id="list" parameterType="hashMap" resultType="com.thc.sprbasic2025.dto.SupportProjectDto$DetailResDto">
+        SELECT support_project.id
+        FROM support_project
+        <include refid="commonWhere"/>
+        ORDER BY support_project.sequence ASC
+    </select>
+
+    <select id="pagedListCount" parameterType="hashMap" resultType="Integer">
+        SELECT count(support_project.id) as listsize
+        FROM support_project
+        <include refid="commonWhere"/>
+    </select>
+
+    <select id="pagedList" parameterType="hashMap" resultType="com.thc.sprbasic2025.dto.SupportProjectDto$DetailResDto">
+        SELECT support_project.id
+        FROM support_project
+        <include refid="commonWhere"/>
+
+        <if test = "orderby != null and orderby =='id'">ORDER BY support_project.id </if>
+        <if test = "orderby != null and orderby =='title'">ORDER BY support_project.title </if>
+        <if test = "orderby != null and orderby =='publishedDate'">ORDER BY support_project.published_date </if>
+        <if test = "orderway != null and orderway =='DESC'"> DESC</if>
+        <if test = "orderway != null and orderway =='ASC'"> ASC</if>
+        LIMIT #{offset}, #{perpage}
+    </select>
+
+    <select id="scrollList" parameterType="hashMap" resultType="com.thc.sprbasic2025.dto.SupportProjectDto$DetailResDto">
+        SELECT support_project.id
+        FROM support_project
+        <include refid="commonWhere"/>
+
+        <if test = "orderby != null and orderby =='id'">
+            <if test = "orderway != null and orderway =='DESC'">
+                <if test = "cursor != null and cursor !=''">AND #{cursor} > support_project.id </if>
+                ORDER BY support_project.id DESC
+            </if>
+            <if test = "orderway != null and orderway =='ASC'">
+                <if test = "cursor != null and cursor !=''">AND support_project.id > #{cursor}</if>
+                ORDER BY support_project.id ASC
+            </if>
+        </if>
+        <if test = "orderby != null and orderby =='title'">
+            <if test = "orderway != null and orderway =='DESC'">
+                <if test = "mark != null and mark !=''">AND #{mark} > CONCAT(support_project.title, '_', support_project.id) </if>
+                ORDER BY support_project.title DESC
+            </if>
+            <if test = "orderway != null and orderway =='ASC'">
+                <if test = "mark != null and mark !=''">AND CONCAT(support_project.title, '_', support_project.id) > #{mark}</if>
+                ORDER BY support_project.title ASC
+            </if>
+        </if>
+
+        LIMIT 0, #{perpage}
+    </select>
+</mapper>

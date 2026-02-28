@@ -13,10 +13,11 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
-@Table(indexes = {@Index(columnList = "deleted, username, rfrom")})
+@Table(indexes = {@Index(columnList = "deleted, username, email, rfrom")})
 @Entity
 public class User extends AuditingFields{
     @Column(length = 100, unique = true) String username;
+    @Column(length = 200) String email;
     String password;
     @Column(unique = true, nullable = false) String code;
     String name;
@@ -31,9 +32,10 @@ public class User extends AuditingFields{
     String fcm;
 
     protected User(){}
-    private User(Boolean deleted, String username, String password, String code, String name, String nick, String phone, Integer birthyear, String gender, String region, String img, Integer rfrom, String fcm){
+    private User(Boolean deleted, String username, String email, String password, String code, String name, String nick, String phone, Integer birthyear, String gender, String region, String img, Integer rfrom, String fcm){
         this.deleted = deleted;
         this.username = username;
+        this.email = email;
         this.password = password;
         this.code = code;
         this.name = name;
@@ -47,8 +49,8 @@ public class User extends AuditingFields{
         this.rfrom = rfrom;
         this.fcm = fcm;
     }
-    public static User of(String username, String password, String code, String name, String nick, String phone, Integer birthyear, String gender, String region, String img, Integer rfrom){
-        return new User(false, username, password, code, name, nick, phone, birthyear, gender, region, img, rfrom, null);
+    public static User of(String username, String email, String password, String code, String name, String nick, String phone, Integer birthyear, String gender, String region, String img, Integer rfrom){
+        return new User(false, username, email, password, code, name, nick, phone, birthyear, gender, region, img, rfrom, null);
     }
     public DefaultDto.CreateResDto toCreateResDto() {
         return DefaultDto.CreateResDto.builder().id(getId()).build();
@@ -57,6 +59,7 @@ public class User extends AuditingFields{
     public void update(UserDto.UpdateReqDto param){
         if(param.getDeleted() != null){ setDeleted(param.getDeleted()); }
         if(param.getPassword() != null){ setPassword(param.getPassword()); }
+        if(param.getEmail() != null){ setEmail(param.getEmail()); }
         if(param.getCode() != null){ setCode(param.getCode()); }
         if(param.getName() != null){ setName(param.getName()); }
         if(param.getNick() != null){ setNick(param.getNick()); }

@@ -2,59 +2,70 @@
 <html lang="ko">
 <th:block th:replace="~{includes/user/head}" />
 <link rel="stylesheet" href="/frontswcenter/css/aside.css">
+<link rel="stylesheet" href="/frontswcenter/css/notice-list.css">
 <body>
 
 <script id="list_info_notice" type="text/x-handlebars-template">
     {{#resultData_notice}}
-    <tr class="gradeA">
-        <td><font class="font_notice_order"></font></td>
-        <td class="cursor_pointer" onclick="location.href='/notice/detail/{{id}}';">{{title}}</td>
-        <td>{{createdAt}}
-            <input type="hidden" class="input_cursor_notice_id" value="{{id}}"/>
-        </td>
-        <td class="text-center">{{viewCount}}</td>
-        <td class="text-center">{{likeCount}}</td>
-    </tr>
+    <li class="notice-item">
+        <a class="notice-link" href="/notice/detail/{{id}}">
+            <span class="notice-title">{{title}}</span>
+        </a>
+    </li>
     {{/resultData_notice}}
 </script>
 <script type="text/javascript">
     var list_info_notice = $("#list_info_notice").html();
     var list_info_notice_template = Handlebars.compile(list_info_notice);
+
+    const noticeState = {
+        callpage: 1,
+        perpage: 10,
+        totalpage: 1,
+        pageWindow: 5,
+        loading: false
+    };
 </script>
 
 <th:block th:replace="~{includes/user/header}" />
 
-<div class="page-layout">
+<div class="page-layout notice-layout">
     <th:block th:replace="~{includes/user/aside}" />
     <script> listener_aside_nav_active("news", 1); </script>
 
+    <main class="content-area notice-list-page">
+        <div class="notice-toolbar">
+            <form id="notice_search_form" class="notice-search-form">
+                <div class="notice-search-input-wrap">
+                    <input id="search_notice_keyword"
+                           class="notice-search-input"
+                           type="text"
+                           placeholder="검색어를 입력하세요"
+                           autocomplete="off" />
+                    <button type="submit" class="notice-search-button" aria-label="검색"></button>
+                </div>
+            </form>
+        </div>
 
-    <main class="content-area list-page">
-        <div class="content-header">
-            <h1 class="page-title">공지사항</h1>
-            <div class="content-actions">
-                <button class="primary-button" id="notice_write_button" onclick="location.href='/notice/create'; return false;">글쓰기</button>
+        <div class="notice-filter-row">
+            <div class="notice-filter-box">
+                <select id="search_notice_type" class="notice-filter-select" aria-label="검색 기준">
+                    <option value="all" selected>All</option>
+                    <option value="title">Title</option>
+                    <option value="content">Content</option>
+                </select>
             </div>
         </div>
 
-        <div class="content-box">
-            <table class="table list-table" id="dataTable">
-                <thead>
-                <tr>
-                    <th>번호</th>
-                    <th>제목</th>
-                    <th>작성일</th>
-                    <th>조회수</th>
-                    <th>좋아요</th>
-                </tr>
-                </thead>
-                <tbody id="tbody_notice_list">
-                </tbody>
-            </table>
+        <ul class="notice-items" id="notice_list"></ul>
+
+        <div class="notice-bottom-bar">
+            <div class="notice-write-wrap" id="notice_write_wrap" style="display: none;">
+                <button class="notice-write-button" onclick="location.href='/notice/create'; return false;">글쓰기</button>
+            </div>
+            <div class="notice-pagination" id="notice_pagination"></div>
         </div>
-
     </main>
-
 </div>
 
 <th:block th:replace="~{includes/user/footer}" />
@@ -62,46 +73,154 @@
 
 <script>
     $(function(){
-        console.log( "ready!" );
+        $("#notice_search_form").on("submit", function(e){
+            e.preventDefault();
+            listener_notice_keyword_changed();
+        });
+
+        $("#search_notice_type").on("change", function(){
+            listener_notice_keyword_changed();
+        });
+
+        load_notice_write_visibility();
         search_notice();
-        if (!listener_is_login()) {
-            $("#notice_write_button").hide();
-        }
     });
+
     function listener_notice_keyword_changed(){
-        $("#input_notice_keyword_changed").val("1");
-        $("#tbody_notice_list").html("");
+        noticeState.callpage = 1;
         search_notice();
     }
+
+    function listener_notice_callpage(obj_num){
+        if (obj_num < 1 || obj_num > noticeState.totalpage || obj_num === noticeState.callpage) {
+            return;
+        }
+        noticeState.callpage = obj_num;
+        search_notice();
+    }
+
     function search_notice() {
+        if (noticeState.loading) {
+            return;
+        }
+
+        noticeState.loading = true;
+
         let _data = new Map();
-        _data.url = "/api/notice/scrollList";
+        _data.url = "/api/notice/pagedList";
         _data.type = "GET";
         _data.param = {
-            perpage: 10
-            , orderby: "id"
-            , orderway: "DESC"
-            , cursor: listenerGetCursor("notice")
-            , deleted: false
+            perpage: noticeState.perpage,
+            callpage: noticeState.callpage,
+            orderby: "id",
+            orderway: "DESC",
+            deleted: false,
+            searchType: $("#search_notice_type").val(),
+            keyword: $.trim($("#search_notice_keyword").val())
         };
-        _data.success = function (obj_data, obj_status, obj_xhr) {
-            /*let input_notice_keyword_changed = $("#input_notice_keyword_changed").val();
-            if(input_notice_keyword_changed === "1"){
-                $("#input_notice_keyword_changed").val("");
-            }*/
-            let tempList = obj_data;
-            for (let each of tempList) {
-                each.viewCount = each.viewCount || 0;
-                each.likeCount = each.likeCount || 0;
-                let tList = [];
-                tList.push(each);
-                $("#tbody_notice_list").append(list_info_notice_template({"resultData_notice": tList}));
+        _data.success = function (obj_data) {
+            let tempList = Array.isArray(obj_data && obj_data.list) ? obj_data.list : [];
+
+            if (tempList.length === 0) {
+                render_notice_empty("등록된 공지사항이 없습니다.");
+            } else {
+                $("#notice_list").html(list_info_notice_template({"resultData_notice": tempList}));
             }
-            listenerAfterScrollList("notice");
-        }
+
+            noticeState.totalpage = Math.max(1, parseInt(obj_data && obj_data.totalpage, 10) || 1);
+            noticeState.callpage = Math.min(
+                noticeState.totalpage,
+                Math.max(1, parseInt(obj_data && obj_data.callpage, 10) || 1)
+            );
+
+            render_notice_pagination(noticeState.totalpage, noticeState.callpage);
+            noticeState.loading = false;
+        };
         _data.error = function (obj_data, obj_status, obj_xhr) {
-            alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
+            noticeState.loading = false;
+
+            if (obj_xhr && (obj_xhr.status === 401 || obj_xhr.status === 403)) {
+                render_notice_empty("공지사항은 로그인 후 확인할 수 있습니다.");
+            } else {
+                render_notice_empty("공지사항을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
+            }
+
+            render_notice_pagination(1, 1);
+        };
+        func_ajax(_data);
+    }
+
+    function render_notice_empty(message) {
+        let $empty = $("<li>", {
+            class: "notice-empty",
+            text: message
+        });
+        $("#notice_list").html($empty);
+    }
+
+    function render_notice_pagination(totalPage, callPage) {
+        let safeTotal = Math.max(1, totalPage || 1);
+        let safeCall = Math.min(safeTotal, Math.max(1, callPage || 1));
+        let $pagination = $("#notice_pagination");
+        $pagination.empty();
+
+        let $prev = $("<button>", {
+            class: "notice-page-btn",
+            text: "<",
+            click: function() {
+                listener_notice_callpage(Math.max(1, safeCall - 1));
+            }
+        });
+        $pagination.append($prev);
+
+        let pageWindow = noticeState.pageWindow;
+        let startPage = Math.max(1, safeCall - Math.floor(pageWindow / 2));
+        let endPage = Math.min(safeTotal, startPage + pageWindow - 1);
+        startPage = Math.max(1, endPage - pageWindow + 1);
+
+        for (let i = startPage; i <= endPage; i++) {
+            let $btn = $("<button>", {
+                class: "notice-page-number" + (i === safeCall ? " active" : ""),
+                text: i,
+                click: function() {
+                    listener_notice_callpage(i);
+                }
+            });
+            $pagination.append($btn);
         }
+
+        let $next = $("<button>", {
+            class: "notice-page-btn",
+            text: ">",
+            click: function() {
+                listener_notice_callpage(Math.min(safeTotal, safeCall + 1));
+            }
+        });
+        $pagination.append($next);
+    }
+
+    function load_notice_write_visibility(){
+        $("#notice_write_wrap").hide();
+
+        if (!listener_is_login()) {
+            return;
+        }
+
+        let _data = new Map();
+        _data.url = "/api/permissiondetail/allow";
+        _data.type = "POST";
+        _data.param = {
+            target: "notice",
+            func: 110
+        };
+        _data.success = function(obj_data){
+            if(obj_data != null && obj_data.allowed === true){
+                $("#notice_write_wrap").show();
+            }
+        };
+        _data.error = function(){
+            $("#notice_write_wrap").hide();
+        };
         func_ajax(_data);
     }
 </script>

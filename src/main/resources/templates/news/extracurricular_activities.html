@@ -2,6 +2,7 @@
 <html lang="ko">
 <th:block th:replace="~{includes/user/head}" />
 <link rel="stylesheet" href="/frontswcenter/css/aside.css">
+<link rel="stylesheet" href="/frontswcenter/css/extracurricular.css">
 <body>
 
 <th:block th:replace="~{includes/user/header}" />
@@ -10,20 +11,150 @@
     <th:block th:replace="~{includes/user/aside}" />
     <script> listener_aside_nav_active("news", 3); </script>
 
-    <main class="content-area">
-        <h1 class="page-title">대외활동</h1>
-
-        <div class="content-box">
-            여기에 "대외활동" 본문 내용을 넣으면 됩니다!
-            <br><br>
-            이미지나 표 영역이 들어가요.
+    <main class="content-area extracurricular-page">
+        <div class="extracurricular-toolbar">
+            <div class="extracurricular-search">
+                <input type="text" id="extracurricular_keyword" placeholder="검색어를 입력하세요" />
+                <button onclick="reload_extracurricular_list(); return false;" aria-label="검색">⌕</button>
+            </div>
+            <div class="extracurricular-filter">
+                <select id="extracurricular_category" onchange="reload_extracurricular_list();">
+                    <option value="all">All</option>
+                </select>
+            </div>
         </div>
 
+        <section>
+            <div class="extracurricular-grid" id="extracurricular_list"></div>
+        </section>
     </main>
 </div>
 
 <th:block th:replace="~{includes/user/footer}" />
 <th:block th:replace="~{includes/user/bottom}" />
+
+<script>
+    const EXTRACURRICULAR_DEFAULT_IMAGE = "/frontswcenter/img/value-spread/test06.jpg";
+    const SAMPLE_EXTRACURRICULAR_ITEMS = [
+        {
+            id: 901,
+            title: "최우수상 수상",
+            summary: "한동대 학생팀, AI 엔터테인먼트 서비스로 리얼톤",
+            category: "all",
+            img: EXTRACURRICULAR_DEFAULT_IMAGE,
+            detailUrl: "https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html"
+        },
+        {
+            id: 902,
+            title: "최우수상 수상",
+            summary: "한동대 학생팀, AI 엔터테인먼트 서비스로 리얼톤",
+            category: "all",
+            img: EXTRACURRICULAR_DEFAULT_IMAGE,
+            detailUrl: "https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html"
+        },
+        {
+            id: 903,
+            title: "최우수상 수상",
+            summary: "한동대 학생팀, AI 엔터테인먼트 서비스로 리얼톤",
+            category: "all",
+            img: EXTRACURRICULAR_DEFAULT_IMAGE,
+            detailUrl: "https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html"
+        },
+        {
+            id: 904,
+            title: "최우수상 수상",
+            summary: "한동대 학생팀, AI 엔터테인먼트 서비스로 리얼톤",
+            category: "all",
+            img: EXTRACURRICULAR_DEFAULT_IMAGE,
+            detailUrl: "https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html"
+        },
+        {
+            id: 905,
+            title: "최우수상 수상",
+            summary: "한동대 학생팀, AI 엔터테인먼트 서비스로 리얼톤",
+            category: "all",
+            img: EXTRACURRICULAR_DEFAULT_IMAGE,
+            detailUrl: "https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html"
+        },
+        {
+            id: 906,
+            title: "최우수상 수상",
+            summary: "한동대 학생팀, AI 엔터테인먼트 서비스로 리얼톤",
+            category: "all",
+            img: EXTRACURRICULAR_DEFAULT_IMAGE,
+            detailUrl: "https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html"
+        }
+    ];
+
+    $(function(){
+        $("#extracurricular_keyword").on("keydown", function(e){
+            if (e.key === "Enter") {
+                reload_extracurricular_list();
+            }
+        });
+        reload_extracurricular_list();
+    });
+
+    function reload_extracurricular_list() {
+        $("#extracurricular_list").html("");
+        search_extracurricular();
+    }
+
+    function search_extracurricular() {
+        let keyword = ($("#extracurricular_keyword").val() || "").trim().toLowerCase();
+        let category = ($("#extracurricular_category").val() || "all").trim().toLowerCase();
+
+        let rows = SAMPLE_EXTRACURRICULAR_ITEMS.filter(function(item){
+            let itemCategory = (item.category || "all").toLowerCase();
+            if (category !== "all" && itemCategory !== category) {
+                return false;
+            }
+            if (!keyword) {
+                return true;
+            }
+            let haystack = ((item.title || "") + " " + (item.summary || "")).toLowerCase();
+            return haystack.indexOf(keyword) >= 0;
+        });
+
+        if (rows.length === 0) {
+            $("#extracurricular_list").html("<div class='extracurricular-empty'>등록된 대외활동 소식이 없습니다.</div>");
+            return;
+        }
+
+        for (let each of rows) {
+            append_extracurricular_item(each);
+        }
+    }
+
+    function append_extracurricular_item(item) {
+        let title = escape_html(item.title || "제목 없음");
+        let subtitle = escape_html(item.summary || item.tags || "");
+        let img = item.img && (item.img + "").trim() ? item.img : EXTRACURRICULAR_DEFAULT_IMAGE;
+        let detailUrl = item.detailUrl && (item.detailUrl + "").trim() ? item.detailUrl : "javascript:void(0);";
+
+        let card = ""
+            + "<article class='extracurricular-card'>"
+            + "  <a class='extracurricular-link' href='" + detailUrl + "' target='_blank' rel='noopener noreferrer'>"
+            + "    <img class='extracurricular-thumb' src='" + img + "' alt='대외활동 이미지'>"
+            + "    <div class='extracurricular-overlay'>"
+            + "      <div class='extracurricular-subtitle'>" + subtitle + "</div>"
+            + "      <div class='extracurricular-title'>" + title + "</div>"
+            + "    </div>"
+            + "  </a>"
+            + "</article>";
+
+        $("#extracurricular_list").append(card);
+    }
+
+    function escape_html(value) {
+        return (value + "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/\"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+</script>
 
 </body>
 </html>

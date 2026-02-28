@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<th:block th:replace="~{includes/user/head}" />
+<link rel="stylesheet" href="/frontswcenter/css/aside.css">
+<body>
+
+<th:block th:replace="~{includes/user/header}" />
+
+<div class="page-layout">
+    <th:block th:replace="~{includes/user/aside}" />
+    <script> listener_aside_nav_active("news", 1); </script>
+
+    <main class="content-area">
+        <h1 class="page-title">공지사항 수정</h1>
+
+        <div class="content-box">
+            <div class="form-grid">
+                <input type="hidden" id="edit_notice_id" />
+                <div class="form-field">
+                    <label for="edit_notice_title">제목</label>
+                    <input type="text" class="input_param input_required" id="edit_notice_title" name="title" placeholder="제목을 입력해주세요." />
+                </div>
+                <div class="form-field">
+                    <label for="edit_notice_content">내용</label>
+                    <textarea class="input_param" id="edit_notice_content" name="content" placeholder="내용을 입력해주세요."></textarea>
+                </div>
+                <div class="form-field">
+                    <label for="edit_notice_img_url">메인 이미지 URL</label>
+                    <input type="text" class="input_param" id="edit_notice_img_url" name="img" placeholder="/image/..." />
+                </div>
+                <div class="form-field">
+                    <label for="edit_notice_img_file">메인 이미지 파일</label>
+                    <input type="file" id="edit_notice_img_file" accept="image/*" onchange="upload_notice_image();" />
+                    <img class="hide" id="img_edit_notice_img_file" style="height: 75px;" alt="메인 사진" />
+                </div>
+                <div class="content-actions">
+                    <button class="secondary-button" onclick="location.href='/notice/detail/' + getIdFromUrl(null); return false;">취소</button>
+                    <button class="primary-button" onclick="update_notice(); return false;">수정 저장</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<th:block th:replace="~{includes/user/footer}" />
+<th:block th:replace="~{includes/user/bottom}" />
+
+<script>
+    $(function(){
+        if (!listener_is_login()) {
+            alert("로그인이 필요합니다.");
+            location.replace("/user/login");
+            return;
+        }
+        load_notice();
+    });
+
+    function load_notice(){
+        let noticeId = getIdFromUrl(null);
+        let _data = new Map();
+        _data.url = "/api/notice";
+        _data.type = "GET";
+        _data.param = {id: noticeId};
+        _data.success = function(obj_data){
+            if (!obj_data || obj_data.canUpdate !== true) {
+                alert("공지 수정 권한이 없습니다.");
+                location.replace("/notice/detail/" + noticeId);
+                return;
+            }
+            $("#edit_notice_id").val(obj_data.id || noticeId);
+            $("#edit_notice_title").val(obj_data.title || "");
+            $("#edit_notice_content").val(obj_data.content || "");
+            $("#edit_notice_img_url").val(obj_data.img || "");
+            if (obj_data.img) {
+                $("#img_edit_notice_img_file").attr("src", obj_data.img).removeClass("hide");
+            }
+        };
+        _data.error = function(){
+            alert("공지 정보를 불러오지 못했습니다.");
+            location.replace("/notice/list");
+        };
+        func_ajax(_data);
+    }
+
+    function upload_notice_image() {
+        let tempFile = null;
+        let inputFile = document.getElementById("edit_notice_img_file");
+        if (inputFile.files.length > 0) {
+            tempFile = inputFile.files[0];
+        }
+        if (tempFile == null) {
+            return;
+        }
+        let fileData = new FormData();
+        fileData.append("file", tempFile);
+        $.ajax({
+            url: "/api/default/uploadFile",
+            type: "POST",
+            data: fileData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function(data){
+                let imgPath = "/image/" + data;
+                $("#edit_notice_img_url").val(imgPath);
+                $("#img_edit_notice_img_file").attr("src", imgPath).removeClass("hide");
+            },
+            error: function(){
+                alert("이미지 업로드 중 오류가 발생했습니다.");
+            }
+        });
+    }
+
+    function update_notice(){
+        let title = ($("#edit_notice_title").val() || "").trim();
+        if (!title) {
+            alert("제목을 입력해주세요.");
+            return;
+        }
+        let noticeId = Number($("#edit_notice_id").val() || getIdFromUrl(null));
+        let _data = new Map();
+        _data.url = "/api/notice";
+        _data.type = "PUT";
+        _data.param = {
+            id: noticeId,
+            title: title,
+            content: $("#edit_notice_content").val(),
+            img: ($("#edit_notice_img_url").val() || "").trim()
+        };
+        _data.success = function(){
+            alert("수정되었습니다.");
+            location.href = "/notice/detail/" + noticeId;
+        };
+        _data.error = function(){
+            alert("수정 중 오류가 발생했습니다.");
+        };
+        func_ajax(_data);
+    }
+</script>
+</body>
+</html>

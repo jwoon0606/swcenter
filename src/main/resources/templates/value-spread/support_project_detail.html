@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<th:block th:replace="~{includes/user/head}" />
+<link rel="stylesheet" href="/frontswcenter/css/aside.css">
+<link rel="stylesheet" href="/frontswcenter/css/introduction.css">
+<style>
+    .support-detail-wrap {
+        border: 1px solid #e3eaf3;
+        border-radius: 12px;
+        padding: 24px;
+        background: #fff;
+    }
+    .support-detail-date {
+        margin-bottom: 8px;
+        color: #8a94a1;
+        font-size: 13px;
+        font-weight: 500;
+    }
+    .support-detail-title {
+        margin: 0 0 14px;
+        font-size: 25px;
+        font-weight: 700;
+        color: #28384d;
+        line-height: 1.4;
+        word-break: keep-all;
+    }
+    .support-detail-thumb {
+        width: 100%;
+        max-width: 900px;
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+        display: block;
+        border: 1px solid #e5e9f1;
+        background: #f4f6fa;
+    }
+    .support-detail-content {
+        margin-top: 16px;
+        color: #445061;
+        line-height: 1.75;
+        font-size: 15px;
+        white-space: pre-line;
+    }
+    .support-detail-actions {
+        margin-top: 22px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .support-detail-btn {
+        border: 1px solid #0f3f76;
+        background: #0f3f76;
+        color: #fff;
+        padding: 9px 14px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .support-detail-btn.secondary {
+        background: #fff;
+        color: #0f3f76;
+    }
+    .support-detail-empty {
+        border: 1px dashed #c9d7e7;
+        border-radius: 12px;
+        padding: 30px 20px;
+        text-align: center;
+        color: #5e6f83;
+        background: #f9fbff;
+    }
+    @media (max-width: 768px) {
+        .support-detail-wrap {
+            padding: 16px;
+        }
+        .support-detail-title {
+            font-size: 20px;
+            line-height: 1.45;
+        }
+        .support-detail-content {
+            font-size: 14px;
+            line-height: 1.7;
+        }
+    }
+</style>
+<body>
+
+<th:block th:replace="~{includes/user/header}" />
+
+<div class="page-layout">
+    <th:block th:replace="~{includes/user/aside}" />
+    <script> listener_aside_nav_active("value-spread", 1); </script>
+
+    <main class="content-area mission-content-area">
+
+        <section id="support_project_detail_box" class="support-detail-wrap" style="display:none;">
+            <div id="support_project_detail_date" class="support-detail-date">-</div>
+            <h1 id="support_project_detail_title" class="support-detail-title">-</h1>
+            <img id="support_project_detail_img" class="support-detail-thumb" src="/frontswcenter/img/value-spread/sw_val_candidate1.png" alt="지원 프로젝트 이미지" />
+            <div id="support_project_detail_content" class="support-detail-content"></div>
+            <div class="support-detail-actions">
+                <a id="support_project_detail_link" class="support-detail-btn" href="#" target="_blank" rel="noopener" style="display:none;">프로젝트 바로가기</a>
+                <a class="support-detail-btn secondary" href="/value-spread/support_project">목록으로</a>
+            </div>
+        </section>
+
+        <section id="support_project_detail_empty" class="support-detail-empty" style="display:none;">
+            요청하신 지원 프로젝트를 찾을 수 없습니다.
+        </section>
+    </main>
+</div>
+
+<th:block th:replace="~{includes/user/footer}" />
+<th:block th:replace="~{includes/user/bottom}" />
+
+<script>
+    const SUPPORT_PROJECT_DETAIL_FALLBACK_IMG = "/frontswcenter/img/value-spread/sw_val_candidate1.png";
+
+    function supportProjectDetailIdFromPath() {
+        const chunks = window.location.pathname.split("/").filter(Boolean);
+        if (chunks.length === 0) {
+            return null;
+        }
+        return chunks[chunks.length - 1];
+    }
+
+    function supportProjectDetailDate(item) {
+        if (item && item.publishedDate) {
+            return String(item.publishedDate).slice(0, 10);
+        }
+        if (item && item.createdAt) {
+            return String(item.createdAt).slice(0, 10);
+        }
+        return "-";
+    }
+
+    function supportProjectDetailShow(item) {
+        $("#support_project_detail_date").text(supportProjectDetailDate(item));
+        $("#support_project_detail_title").text(item.title || "-");
+        $("#support_project_detail_content").text(item.content || "");
+
+        const img = document.getElementById("support_project_detail_img");
+        img.src = item.img ? item.img : SUPPORT_PROJECT_DETAIL_FALLBACK_IMG;
+        img.onerror = function() {
+            this.onerror = null;
+            this.src = SUPPORT_PROJECT_DETAIL_FALLBACK_IMG;
+        };
+
+        if (item.url) {
+            $("#support_project_detail_link").attr("href", item.url).show();
+        } else {
+            $("#support_project_detail_link").hide();
+        }
+
+        $("#support_project_detail_box").show();
+        $("#support_project_detail_empty").hide();
+    }
+
+    function supportProjectDetailEmpty() {
+        $("#support_project_detail_box").hide();
+        $("#support_project_detail_empty").show();
+    }
+
+    function searchSupportProjectDetail() {
+        const id = supportProjectDetailIdFromPath();
+        if (!id || isNaN(Number(id))) {
+            supportProjectDetailEmpty();
+            return;
+        }
+
+        let _data = new Map();
+        _data.url = "/api/support_project";
+        _data.type = "GET";
+        _data.param = { id: id };
+        _data.success = function(obj_data) {
+            if (!obj_data || !obj_data.id || obj_data.deleted === true) {
+                supportProjectDetailEmpty();
+                return;
+            }
+            supportProjectDetailShow(obj_data);
+        };
+        _data.error = function() {
+            supportProjectDetailEmpty();
+        };
+        func_ajax(_data);
+    }
+
+    $(document).ready(function() {
+        searchSupportProjectDetail();
+    });
+</script>
+
+</body>
+</html>

@@ -12,6 +12,8 @@
 			 , notice.title
 			 , notice.content
 			 , notice.img
+			 , notice.view_count as viewCount
+			 , notice.like_count as likeCount
 		FROM notice
 		WHERE notice.id = #{id}
 	</select>
@@ -23,6 +25,19 @@
 		<if test="sdate != null and sdate != ''">AND notice.created_at >= CONCAT(#{sdate}, ' 00:00:00')</if>
 		<if test="fdate != null and fdate != ''">AND CONCAT(#{fdate}, ' 23:59:59') >= notice.created_at</if>
 		<if test = "title != null and title !=''">AND notice.title LIKE CONCAT('%', #{title}, '%')</if>
+		<if test = "keyword != null and keyword != ''">
+			<choose>
+				<when test = "searchType != null and searchType == 'title'">
+					AND notice.title LIKE CONCAT('%', #{keyword}, '%')
+				</when>
+				<when test = "searchType != null and searchType == 'content'">
+					AND notice.content LIKE CONCAT('%', #{keyword}, '%')
+				</when>
+				<otherwise>
+					AND (notice.title LIKE CONCAT('%', #{keyword}, '%') OR notice.content LIKE CONCAT('%', #{keyword}, '%'))
+				</otherwise>
+			</choose>
+		</if>
 	</sql>
 
 	<select id="list" parameterType="hashMap" resultType="com.thc.sprbasic2025.dto.NoticeDto$DetailResDto">

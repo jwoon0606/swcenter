@@ -10,7 +10,7 @@
     <th:block th:replace="~{includes/user/aside}" />
     <script> listener_aside_nav_active("board", 1); </script>
 
-    <main class="content-area">
+    <main class="content-area board-create-page">
         <h1 class="page-title">일반게시판 작성</h1>
 
         <div class="content-box">
@@ -19,11 +19,35 @@
                     <label for="create_board_title">제목</label>
                     <input type="text" class="input_param input_required" id="create_board_title" name="title" placeholder="제목을 입력해주세요." />
                 </div>
+                <div class="form-row-inline">
+                    <div class="form-field">
+                        <label for="create_board_subject">주제</label>
+                        <select id="create_board_subject" name="subject">
+                            <option value="일상">일상</option>
+                            <option value="자유" selected>자유</option>
+                            <option value="고민">고민</option>
+                        </select>
+                    </div>
+                    <div class="form-field checkbox-field">
+                        <label for="create_board_anonymous">작성자 공개</label>
+                        <label class="check-label" for="create_board_anonymous">
+                            <input type="checkbox" id="create_board_anonymous" name="anonymous" />
+                            익명으로 작성
+                        </label>
+                        <p class="field-note" id="anonymous_status_text">현재 작성자 이름이 표시됩니다.</p>
+                    </div>
+                </div>
                 <div class="form-field">
                     <label for="create_board_content">내용</label>
                     <textarea class="input_param" id="create_board_content" name="content" placeholder="내용을 입력해주세요."></textarea>
                 </div>
+                <div class="form-field">
+                    <label for="create_board_img">메인 이미지</label>
+                    <input type="file" id="create_board_img" accept="image/*" onchange="listenerSetImage(this, null)" />
+                    <img class="hide" id="img_create_board_img" style="height: 75px;" alt="메인 사진" />
+                </div>
                 <div class="content-actions">
+                    <button class="secondary-button" onclick="location.href='/board/list'; return false;">취소</button>
                     <button class="primary-button" onclick="create_board(); return false;">등록하기</button>
                 </div>
             </div>
@@ -40,13 +64,38 @@
             alert("로그인이 필요합니다.");
             location.replace("/user/login");
         }
+        $("#create_board_anonymous").on("change", sync_anonymous_status_text);
+        sync_anonymous_status_text();
     });
     function create_board(){
-        let _param = listenerCreateParam();
+        let title = ($("#create_board_title").val() || "").trim();
+        if (!title) {
+            alert("제목을 입력해주세요.");
+            return;
+        }
+        let _param = {
+            title: title,
+            content: $("#create_board_content").val(),
+            subject: ($("#create_board_subject").val() || "자유").trim(),
+            anonymous: $("#create_board_anonymous").is(":checked")
+        };
+        let tempFile = null;
+        let inputFile = document.getElementById('create_board_img');
+        if (inputFile.files.length > 0) {
+            tempFile = inputFile.files[0];
+        }
+        let formData = new FormData();
+        if (tempFile != null) {
+            formData.append('file', tempFile);
+        }
+        formData.append('params', new Blob([JSON.stringify(_param)], {
+            type: "application/json; charset=utf-8"
+        }));
         let _data = {};
         _data.url = "/api/board";
         _data.type = "POST";
-        _data.param = _param;
+        _data.param = formData;
+        _data.contentType = false;
         _data.success = function(){
             alert("등록 성공");
             location.href = "/board/list";
@@ -55,6 +104,15 @@
             alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
         }
         func_ajax(_data);
+    }
+
+    function sync_anonymous_status_text() {
+        let anonymousChecked = $("#create_board_anonymous").is(":checked");
+        $("#anonymous_status_text").text(
+            anonymousChecked
+                ? "현재 익명으로 표시됩니다."
+                : "현재 작성자 이름이 표시됩니다."
+        );
     }
 </script>
 </body>

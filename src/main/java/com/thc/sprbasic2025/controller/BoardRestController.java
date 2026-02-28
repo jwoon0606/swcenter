@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,9 +33,21 @@ public class BoardRestController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("")
+    @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DefaultDto.CreateResDto> create(@RequestBody BoardDto.CreateReqDto params, @AuthenticationPrincipal PrincipalDetails principalDetails){
         Long reqUserId = getReqUserId(principalDetails);
+        return ResponseEntity.ok(boardService.create(params, reqUserId));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<DefaultDto.CreateResDto> createMultipart(
+            @RequestPart BoardDto.CreateReqDto params
+            , @RequestPart(required = false) MultipartFile file
+            , @AuthenticationPrincipal PrincipalDetails principalDetails
+    ){
+        Long reqUserId = getReqUserId(principalDetails);
+        params.setFile(file);
         return ResponseEntity.ok(boardService.create(params, reqUserId));
     }
 
@@ -61,13 +74,61 @@ public class BoardRestController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    //@PreAuthorize("permitAll()")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("permitAll()")
     @GetMapping("")
     public ResponseEntity<BoardDto.DetailResDto> detail(DefaultDto.DetailReqDto params
             , @AuthenticationPrincipal PrincipalDetails principalDetails){
         Long reqUserId = getReqUserId(principalDetails);
         return ResponseEntity.ok(boardService.detail(params, reqUserId));
+    }
+
+    @PreAuthorize("permitAll()")
+    @PostMapping("/view")
+    public ResponseEntity<BoardDto.MetricsResDto> view(@RequestBody DefaultDto.DetailReqDto params
+            , @AuthenticationPrincipal PrincipalDetails principalDetails){
+        Long reqUserId = getReqUserId(principalDetails);
+        return ResponseEntity.ok(boardService.increaseViewCount(params, reqUserId));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/like")
+    public ResponseEntity<BoardDto.MetricsResDto> like(@RequestBody BoardDto.LikeReqDto params
+            , @AuthenticationPrincipal PrincipalDetails principalDetails){
+        Long reqUserId = getReqUserId(principalDetails);
+        return ResponseEntity.ok(boardService.updateLikeCount(params, reqUserId));
+    }
+
+    @PreAuthorize("permitAll()")
+    @GetMapping("/comment/list")
+    public ResponseEntity<List<BoardDto.CommentResDto>> commentList(DefaultDto.DetailReqDto params
+            , @AuthenticationPrincipal PrincipalDetails principalDetails){
+        Long reqUserId = getReqUserId(principalDetails);
+        return ResponseEntity.ok(boardService.listComments(params, reqUserId));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/comment")
+    public ResponseEntity<BoardDto.CommentResDto> comment(@RequestBody BoardDto.CommentCreateReqDto params
+            , @AuthenticationPrincipal PrincipalDetails principalDetails){
+        Long reqUserId = getReqUserId(principalDetails);
+        return ResponseEntity.ok(boardService.createComment(params, reqUserId));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping("/comment")
+    public ResponseEntity<BoardDto.CommentResDto> commentUpdate(@RequestBody BoardDto.CommentUpdateReqDto params
+            , @AuthenticationPrincipal PrincipalDetails principalDetails){
+        Long reqUserId = getReqUserId(principalDetails);
+        return ResponseEntity.ok(boardService.updateComment(params, reqUserId));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @DeleteMapping("/comment")
+    public ResponseEntity<Void> commentDelete(@RequestBody DefaultDto.DeleteReqDto params
+            , @AuthenticationPrincipal PrincipalDetails principalDetails){
+        Long reqUserId = getReqUserId(principalDetails);
+        boardService.deleteComment(params, reqUserId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     //@PreAuthorize("permitAll()")
@@ -78,14 +139,14 @@ public class BoardRestController {
         Long reqUserId = getReqUserId(principalDetails);
         return ResponseEntity.ok(boardService.list(params, reqUserId));
     }
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("permitAll()")
     @GetMapping("/pagedList")
     public ResponseEntity<DefaultDto.PagedListResDto> pagedList(BoardDto.PagedListReqDto params, @AuthenticationPrincipal PrincipalDetails principalDetails){
         Long reqUserId = getReqUserId(principalDetails);
         logger.info("reqUserId : " + reqUserId);
         return ResponseEntity.ok(boardService.pagedList(params, reqUserId));
     }
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("permitAll()")
     @GetMapping("/scrollList")
     public ResponseEntity<List<BoardDto.DetailResDto>> scrollList(BoardDto.ScrollListReqDto params, @AuthenticationPrincipal PrincipalDetails principalDetails){
         Long reqUserId = getReqUserId(principalDetails);

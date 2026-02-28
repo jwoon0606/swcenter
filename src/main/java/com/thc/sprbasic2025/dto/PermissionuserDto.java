@@ -28,6 +28,7 @@ public class PermissionuserDto {
         Long userId;
 
         String userUsername;
+        String userEmail;
     }
 
     @Getter @Setter @SuperBuilder @NoArgsConstructor @AllArgsConstructor

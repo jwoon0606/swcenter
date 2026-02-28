@@ -14,11 +14,33 @@
         if (listener_is_login()) {
             $("#topbar_login_link").hide();
             $("#topbar_logout_link").show();
+            load_admin_link_visibility();
         } else {
             $("#topbar_login_link").show();
             $("#topbar_logout_link").hide();
+            $("#topbar_admin_link").hide();
         }
     });
+
+    function load_admin_link_visibility(){
+        $("#topbar_admin_link").hide();
+        let _data = new Map();
+        _data.url = "/api/permissiondetail/allow";
+        _data.type = "POST";
+        _data.param = {
+            target: "admin",
+            func: 200
+        };
+        _data.success = function(obj_data){
+            if(obj_data != null && obj_data.allowed === true){
+                $("#topbar_admin_link").show();
+            }
+        };
+        _data.error = function(){
+            $("#topbar_admin_link").hide();
+        };
+        func_ajax(_data);
+    }
 </script>
 
 <!-- CUSTOM JS!!! -->

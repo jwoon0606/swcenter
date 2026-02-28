@@ -1,12 +1,27 @@
 package com.thc.sprbasic2025.service.impl;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.gson.GsonFactory;
+import com.thc.sprbasic2025.domain.Permission;
+import com.thc.sprbasic2025.domain.Permissiondetail;
+import com.thc.sprbasic2025.domain.Permissionuser;
 import com.thc.sprbasic2025.domain.User;
+import com.thc.sprbasic2025.dto.PermissionDto;
 import com.thc.sprbasic2025.dto.UserDto;
 import com.thc.sprbasic2025.dto.DefaultDto;
 import com.thc.sprbasic2025.exception.NoMatchingDataException;
+import com.thc.sprbasic2025.mapper.PermissionMapper;
 import com.thc.sprbasic2025.mapper.UserMapper;
+import com.thc.sprbasic2025.repository.PermissionRepository;
+import com.thc.sprbasic2025.repository.PermissiondetailRepository;
+import com.thc.sprbasic2025.repository.PermissionuserRepository;
 import com.thc.sprbasic2025.repository.UserRepository;
 import com.thc.sprbasic2025.security.AuthService;
+import com.thc.sprbasic2025.security.ExternalProperties;
 import com.thc.sprbasic2025.service.PermittedService;
 import com.thc.sprbasic2025.service.UserService;
 import com.thc.sprbasic2025.util.MailBox;
@@ -24,11 +39,119 @@ public class UserServiceimpl implements UserService {
     final String target = "user";
 
     final UserRepository userRepository;
+    final PermissionRepository permissionRepository;
+    final PermissiondetailRepository permissiondetailRepository;
+    final PermissionuserRepository permissionuserRepository;
+    final PermissionMapper permissionMapper;
     final UserMapper userMapper;
     final AuthService authService;
     final BCryptPasswordEncoder bCryptPasswordEncoder;
     final PermittedService permittedService;
     final MailBox mailBox;
+    final ExternalProperties externalProperties;
+
+    @Override
+    public String google(String idTokenString) {
+        HttpTransport transport = new NetHttpTransport();
+        JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
+
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
+                .setAudience(Collections.singletonList(externalProperties.getGoogleClientId()))
+                .build();
+
+        String googleSub = null;
+        String name = null;
+        String email = null;
+
+        try {
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            if (idToken == null) {
+                throw new RuntimeException("Invalid Google ID token");
+            }
+            GoogleIdToken.Payload payload = idToken.getPayload();
+            googleSub = payload.getSubject();
+            email = payload.getEmail();
+            name = (String) payload.get("name");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        if (googleSub == null) {
+            throw new RuntimeException("Google Info not found");
+        }
+
+        if (email == null || !email.contains("@handong.")) {
+            return "not_valid_email";
+        }
+
+        String username = googleSub;
+        Long id;
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            String password = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
+            DefaultDto.CreateResDto res = create(
+                    UserDto.CreateReqDto.builder()
+                            .username(username)
+                            .email(email)
+                            .password(password)
+                            .nick(name)
+                            .rfrom(3100)
+                            .build(),
+                    (long) -200
+            );
+            id = res.getId();
+        } else {
+            if (email != null && (user.getEmail() == null || !email.equals(user.getEmail()))) {
+                user.setEmail(email);
+                userRepository.save(user);
+            }
+            id = user.getId();
+        }
+
+        ensureStudentPermissionAssigned(id);
+        return authService.createRefreshToken(id);
+    }
+
+    private void ensureStudentPermissionAssigned(Long userId) {
+        if (permissionMapper.permitted(
+                PermissionDto.PermittedReqDto.builder().userId(userId).target("admin").func(200).build()
+        ) > 0) {
+            return;
+        }
+
+        Permission studentPermission = permissionRepository.findByTitle("일반학생");
+        if (studentPermission == null) {
+            studentPermission = permissionRepository.save(
+                    Permission.of("일반학생", "일반 학생 기본 권한")
+            );
+        } else if (Boolean.TRUE.equals(studentPermission.getDeleted())) {
+            studentPermission.setDeleted(false);
+            studentPermission = permissionRepository.save(studentPermission);
+        }
+
+        String[] studentTargets = {"notice", "board", "news_letter", "extracurricular_activities"};
+        for (String studentTarget : studentTargets) {
+            Permissiondetail detail = permissiondetailRepository.findByPermissionIdAndTargetAndFunc(
+                    studentPermission.getId(), studentTarget, 200
+            );
+            if (detail == null) {
+                permissiondetailRepository.save(
+                        Permissiondetail.of(studentPermission.getId(), studentTarget, 200)
+                );
+            } else if (Boolean.TRUE.equals(detail.getDeleted())) {
+                detail.setDeleted(false);
+                permissiondetailRepository.save(detail);
+            }
+        }
+
+        Permissionuser permissionuser = permissionuserRepository.findByPermissionIdAndUserId(studentPermission.getId(), userId);
+        if (permissionuser == null) {
+            permissionuserRepository.save(Permissionuser.of(studentPermission.getId(), userId));
+        } else if (Boolean.TRUE.equals(permissionuser.getDeleted())) {
+            permissionuser.setDeleted(false);
+            permissionuserRepository.save(permissionuser);
+        }
+    }
 
     @Override
     public boolean nick(UserDto.NickReqDto param, Long reqUserId) {
@@ -47,8 +170,6 @@ public class UserServiceimpl implements UserService {
         return create(param, (long) -200);
     }
 
-    /**/
-
     @Override
     public DefaultDto.CreateResDto create(UserDto.CreateReqDto param, Long reqUserId) {
         permittedService.isPermitted(reqUserId, target, 110);
@@ -57,7 +178,6 @@ public class UserServiceimpl implements UserService {
             throw new RuntimeException("already exist");
         }
         param.setPassword(bCryptPasswordEncoder.encode(param.getPassword()));
-        //닉네임, 코드은 그냥 자동 생성..
         String code = UUID.randomUUID().toString().replace("-", "").substring(0,8);
         param.setCode(code);
 

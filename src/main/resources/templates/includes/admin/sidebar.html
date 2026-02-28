@@ -40,17 +40,18 @@
             </div>
         </div>
     </li>
-    <li class="nav-item nav_div_notice nav_div_faq nav_div_popup nav_div_board" style="display: none">
-        <a class="nav-link collapsed nav_notice_a nav_faq_a nav_popup_a nav_board_a" href="#" data-toggle="collapse" data-target="#nav_notice_div" aria-expanded="true" aria-controls="collapseTwo">
+    <li class="nav-item nav_div_notice nav_div_faq nav_div_popup nav_div_board nav_div_support_project" style="display: none">
+        <a class="nav-link collapsed nav_notice_a nav_faq_a nav_popup_a nav_board_a nav_support_project_a" href="#" data-toggle="collapse" data-target="#nav_notice_div" aria-expanded="true" aria-controls="collapseTwo">
             <i class="fas fa-fw fa-cog"></i>
             <span>게시글</span>
         </a>
-        <div id="nav_notice_div" class="collapse nav_notice_div nav_faq_div nav_popup_div nav_board_div" aria-labelledby="headingNotice" data-parent="#accordionSidebar">
+        <div id="nav_notice_div" class="collapse nav_notice_div nav_faq_div nav_popup_div nav_board_div nav_support_project_div" aria-labelledby="headingNotice" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item nav_div_notice" href="/notice/admin_list" style="display: none">공지사항</a>
                 <a class="collapse-item nav_div_faq" href="/faq/admin_list" style="display: none">FAQ</a>
                 <a class="collapse-item nav_div_popup" href="/popup/admin_list" style="display: none">팝업</a>
                 <a class="collapse-item nav_div_board" href="/board/admin_list" style="display: none">일반게시판</a>
+                <a class="collapse-item nav_div_support_project" href="/support_project/admin_list" style="display: none">지원 프로젝트</a>
             </div>
         </div>
     </li>
@@ -62,27 +63,36 @@
     $( document ).ready(function() {
         search_permissiondetail();
     });
+    function notify_admin_permission_state(state, targets) {
+        window.adminPermissionState = state;
+        window.adminPermissionTargets = targets || [];
+        window.dispatchEvent(new CustomEvent("admin-permission-state", {
+            detail: { state: state, targets: window.adminPermissionTargets }
+        }));
+    }
     function search_permissiondetail() {
         let _data = new Map();
         _data.url = "/api/permissiondetail/access";
         _data.type = "GET";
         _data.param = {};
+        notify_admin_permission_state("loading", []);
         _data.success = function(obj_data, obj_status, obj_xhr){
-            let tempList = obj_data;
+            let tempList = obj_data || [];
+            let targets = [];
             for(let each of tempList){
                 let tempTarget = each["target"];
+                targets.push(tempTarget);
                 $(".nav_div_" + tempTarget).css("display", "");
             }
-            if(tempList == null || tempList.length === 0){
-                /**/
-                //alert("관리자가 아닌 경우 접속이 불가합니다.");
-                //location.replace("/index");
+            if(tempList.length === 0){
+                notify_admin_permission_state("none", []);
+            } else {
+                notify_admin_permission_state("ok", targets);
             }
         }
         _data.error = function(obj_data, obj_status, obj_xhr){
-            alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
+            notify_admin_permission_state("error", []);
         }
         func_ajax(_data);
     }
 </script>
-

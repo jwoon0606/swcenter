@@ -2,6 +2,62 @@
 <html lang="ko">
 <th:block th:replace="~{includes/user/head}" />
 <link rel="stylesheet" href="/frontswcenter/css/aside.css">
+<link rel="stylesheet" href="/frontswcenter/css/introduction.css">
+<style>
+    .edu-hero {
+        border: 1px solid #d9e8ff;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #f5f8ff 0%, #ebf4ff 100%);
+        padding: 24px;
+        margin-bottom: 16px;
+    }
+    .edu-hero h2 {
+        margin: 0 0 8px;
+        color: #123a66;
+    }
+    .edu-hero p {
+        margin: 0;
+        color: #3a5470;
+        line-height: 1.7;
+    }
+    .edu-block + .edu-block { margin-top: 20px; }
+    .edu-title {
+        margin: 0 0 10px;
+        font-size: 20px;
+        color: #123a66;
+    }
+    .edu-desc {
+        margin: 0 0 12px;
+        color: #4f647a;
+        line-height: 1.7;
+    }
+    .edu-subtitle {
+        margin: 0 0 10px;
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #edf4ff;
+        color: #174a86;
+        font-size: 13px;
+        font-weight: 700;
+    }
+    .edu-image-wrap {
+        overflow: hidden;
+    }
+    .edu-image {
+        width: 100%;
+        display: block;
+    }
+    .edu-source {
+        margin-top: 8px;
+        font-size: 13px;
+        color: #50657a;
+    }
+    @media (max-width: 768px) {
+        .edu-title { font-size: 18px; }
+    }
+</style>
 <body>
 
 <th:block th:replace="~{includes/user/header}" />
@@ -10,13 +66,19 @@
     <th:block th:replace="~{includes/user/aside}" />
     <script> listener_aside_nav_active("value-spread", 3); </script>
 
-    <main class="content-area">
-        <h1 class="page-title">SW교육</h1>
+    <main class="content-area mission-content-area">
 
-        <div class="content-box">
-            여기에 "SW교육" 본문 내용을 넣으면 됩니다!
-            <br><br>
-            이미지나 표 영역이 들어가요.
+
+        <div class="edu-block">
+            <div class="edu-image-wrap">
+                <img class="edu-image" src="/frontswcenter/img/value-spread/sw_edu2.png" alt="SW전공교육 이미지">
+            </div>
+        </div>
+
+        <div class="edu-block">
+            <div class="edu-image-wrap">
+                <img class="edu-image" src="/frontswcenter/img/value-spread/sw_edu1.png" alt="SW융합교육 이미지">
+            </div>
         </div>
 
     </main>

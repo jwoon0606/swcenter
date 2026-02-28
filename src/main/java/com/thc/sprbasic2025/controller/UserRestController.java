@@ -37,6 +37,14 @@ public class UserRestController {
         return principalDetails.getUser().getId();
     }
 
+    @PostMapping("/google")
+    public ResponseEntity<Void> googleLogin(@RequestBody String token) {
+        String refreshToken = userService.google(token);
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(externalProperties.getRefreshKey(), externalProperties.getTokenPrefix() + refreshToken)
+                .build();
+    }
+
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/nick")
     public ResponseEntity<Boolean> nick(@RequestBody UserDto.NickReqDto params, @AuthenticationPrincipal PrincipalDetails principalDetails){

@@ -21,6 +21,7 @@ public class UserDto {
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class CreateReqDto {
         String username;
+        String email;
         String password;
         String code;
         String name;
@@ -33,13 +34,14 @@ public class UserDto {
         Integer rfrom;
 
         public User toEntity(){
-            return User.of(getUsername(), getPassword(), getCode(), getName(), getNick(), getPhone(), getBirthyear(), getGender(), getRegion(), getImg(), getRfrom());
+            return User.of(getUsername(), getEmail(), getPassword(), getCode(), getName(), getNick(), getPhone(), getBirthyear(), getGender(), getRegion(), getImg(), getRfrom());
         }
     }
 
     @Getter @Setter @SuperBuilder @NoArgsConstructor @AllArgsConstructor
     public static class UpdateReqDto extends DefaultDto.UpdateReqDto{
         String password;
+        String email;
         String code;
         String name;
         String nick;
@@ -56,6 +58,7 @@ public class UserDto {
     @Getter @Setter @SuperBuilder @NoArgsConstructor @AllArgsConstructor
     public static class DetailResDto extends DefaultDto.DetailResDto{
         String username;
+        String email;
         String code;
         String name;
         String nick;
@@ -72,7 +75,7 @@ public class UserDto {
     @Getter @Setter @SuperBuilder @NoArgsConstructor @AllArgsConstructor
     public static class ListReqDto extends DefaultDto.ListReqDto{
         String code;
-        String name;
+        String email;
         Integer birthyear;
         String gender;
         String region;
@@ -82,7 +85,7 @@ public class UserDto {
     @Getter @Setter @SuperBuilder @NoArgsConstructor @AllArgsConstructor
     public static class PagedListReqDto extends DefaultDto.PagedListReqDto{
         String code;
-        String name;
+        String email;
         Integer birthyear;
         String gender;
         String region;
@@ -92,7 +95,7 @@ public class UserDto {
     @Getter @Setter @SuperBuilder @NoArgsConstructor @AllArgsConstructor
     public static class ScrollListReqDto extends DefaultDto.ScrollListReqDto{
         String code;
-        String name;
+        String email;
         Integer birthyear;
         String gender;
         String region;
