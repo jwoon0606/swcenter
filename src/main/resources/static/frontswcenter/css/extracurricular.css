@@ -121,6 +121,20 @@
     background: #f9fbff;
 }
 
+.extracurricular-load-wrap {
+    margin-top: 18px;
+    text-align: center;
+}
+
+.extracurricular-load-wrap button {
+    border: 1px solid #1d3f73;
+    background: #fff;
+    color: #1d3f73;
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+}
+
 @media (max-width: 1300px) {
     .extracurricular-title {
         font-size: 30px;

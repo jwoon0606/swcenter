@@ -20,12 +20,6 @@ public class SupportProjectDto {
         Boolean result;
     }
 
-    @Getter @Setter @SuperBuilder @NoArgsConstructor @AllArgsConstructor
-    public static class SeedResDto {
-        Integer createdCount;
-        Integer totalCount;
-    }
-
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
     public static class CreateReqDto {
         Integer sequence;

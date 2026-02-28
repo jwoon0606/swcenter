@@ -94,7 +94,6 @@
 
                 <div class="w-100">
                     <button class="btn btn-primary mb-2" onclick="location.href='/support_project/admin_create'; return false;">생성하기</button>
-                    <button class="btn btn-outline-secondary mb-2 ml-1" onclick="seed_support_project_samples(); return false;">샘플 데이터 생성</button>
                 </div>
 
                 <div class="table-responsive">
@@ -216,23 +215,6 @@
         func_ajax(_data);
     }
 
-    function seed_support_project_samples() {
-        if (!confirm("샘플 데이터를 생성하시겠습니까? 이미 있는 항목은 건너뜁니다.")) {
-            return false;
-        }
-        let _data = new Map();
-        _data.url = "/api/support_project/seedSamples";
-        _data.type = "POST";
-        _data.param = {};
-        _data.success = function(obj_data){
-            alert("생성 " + obj_data.createdCount + "건 / 전체 " + obj_data.totalCount + "건");
-            search_support_project();
-        };
-        _data.error = function(){
-            alert("샘플 데이터 생성 권한이 없거나 요청에 실패했습니다.");
-        };
-        func_ajax(_data);
-    }
 </script>
 
 </body>

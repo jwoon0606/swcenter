@@ -17,15 +17,13 @@
                 <input type="text" id="extracurricular_keyword" placeholder="검색어를 입력하세요" />
                 <button onclick="reload_extracurricular_list(); return false;" aria-label="검색">⌕</button>
             </div>
-            <div class="extracurricular-filter">
-                <select id="extracurricular_category" onchange="reload_extracurricular_list();">
-                    <option value="all">All</option>
-                </select>
-            </div>
         </div>
 
         <section>
             <div class="extracurricular-grid" id="extracurricular_list"></div>
+            <div class="extracurricular-load-wrap" id="extracurricular_load_wrap" style="display:none;">
+                <button onclick="search_extracurricular(); return false;">더보기</button>
+            </div>
         </section>
     </main>
 </div>
@@ -34,57 +32,11 @@
 <th:block th:replace="~{includes/user/bottom}" />
 
 <script>
+    const EXTRACURRICULAR_DEFAULT_DETAIL_URL = "https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html";
     const EXTRACURRICULAR_DEFAULT_IMAGE = "/frontswcenter/img/value-spread/test06.jpg";
-    const SAMPLE_EXTRACURRICULAR_ITEMS = [
-        {
-            id: 901,
-            title: "최우수상 수상",
-            summary: "한동대 학생팀, AI 엔터테인먼트 서비스로 리얼톤",
-            category: "all",
-            img: EXTRACURRICULAR_DEFAULT_IMAGE,
-            detailUrl: "https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html"
-        },
-        {
-            id: 902,
-            title: "최우수상 수상",
-            summary: "한동대 학생팀, AI 엔터테인먼트 서비스로 리얼톤",
-            category: "all",
-            img: EXTRACURRICULAR_DEFAULT_IMAGE,
-            detailUrl: "https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html"
-        },
-        {
-            id: 903,
-            title: "최우수상 수상",
-            summary: "한동대 학생팀, AI 엔터테인먼트 서비스로 리얼톤",
-            category: "all",
-            img: EXTRACURRICULAR_DEFAULT_IMAGE,
-            detailUrl: "https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html"
-        },
-        {
-            id: 904,
-            title: "최우수상 수상",
-            summary: "한동대 학생팀, AI 엔터테인먼트 서비스로 리얼톤",
-            category: "all",
-            img: EXTRACURRICULAR_DEFAULT_IMAGE,
-            detailUrl: "https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html"
-        },
-        {
-            id: 905,
-            title: "최우수상 수상",
-            summary: "한동대 학생팀, AI 엔터테인먼트 서비스로 리얼톤",
-            category: "all",
-            img: EXTRACURRICULAR_DEFAULT_IMAGE,
-            detailUrl: "https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html"
-        },
-        {
-            id: 906,
-            title: "최우수상 수상",
-            summary: "한동대 학생팀, AI 엔터테인먼트 서비스로 리얼톤",
-            category: "all",
-            img: EXTRACURRICULAR_DEFAULT_IMAGE,
-            detailUrl: "https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html"
-        }
-    ];
+
+    let extracurricularCursor = null;
+    let extracurricularLoading = false;
 
     $(function(){
         $("#extracurricular_keyword").on("keydown", function(e){
@@ -92,49 +44,80 @@
                 reload_extracurricular_list();
             }
         });
+        $(document).on("click", ".js-extracurricular-popup", function(e){
+            e.preventDefault();
+            let encodedUrl = $(this).attr("data-popup-url") || "";
+            let targetUrl = decodeURIComponent(encodedUrl);
+            open_extracurricular_popup(targetUrl);
+        });
         reload_extracurricular_list();
     });
 
     function reload_extracurricular_list() {
+        extracurricularCursor = null;
         $("#extracurricular_list").html("");
+        $("#extracurricular_load_wrap").hide();
         search_extracurricular();
     }
 
     function search_extracurricular() {
-        let keyword = ($("#extracurricular_keyword").val() || "").trim().toLowerCase();
-        let category = ($("#extracurricular_category").val() || "all").trim().toLowerCase();
-
-        let rows = SAMPLE_EXTRACURRICULAR_ITEMS.filter(function(item){
-            let itemCategory = (item.category || "all").toLowerCase();
-            if (category !== "all" && itemCategory !== category) {
-                return false;
-            }
-            if (!keyword) {
-                return true;
-            }
-            let haystack = ((item.title || "") + " " + (item.summary || "")).toLowerCase();
-            return haystack.indexOf(keyword) >= 0;
-        });
-
-        if (rows.length === 0) {
-            $("#extracurricular_list").html("<div class='extracurricular-empty'>등록된 대외활동 소식이 없습니다.</div>");
+        if (extracurricularLoading) {
             return;
         }
+        extracurricularLoading = true;
 
-        for (let each of rows) {
-            append_extracurricular_item(each);
-        }
+        let _data = new Map();
+        _data.url = "/api/extracurricular_activities/scrollList";
+        _data.type = "GET";
+        _data.param = {
+            perpage: 6,
+            orderby: "id",
+            orderway: "DESC",
+            cursor: extracurricularCursor,
+            deleted: false,
+            keyword: $("#extracurricular_keyword").val()
+        };
+        _data.success = function(list){
+            let rows = list || [];
+            if (rows.length === 0 && extracurricularCursor == null) {
+                $("#extracurricular_list").html("<div class='extracurricular-empty'>등록된 대외활동 소식이 없습니다.</div>");
+                $("#extracurricular_load_wrap").hide();
+                extracurricularLoading = false;
+                return;
+            }
+
+            for (let each of rows) {
+                append_extracurricular_item(each);
+            }
+
+            if (rows.length > 0) {
+                extracurricularCursor = rows[rows.length - 1].id;
+            }
+
+            if (rows.length >= 6) {
+                $("#extracurricular_load_wrap").show();
+            } else {
+                $("#extracurricular_load_wrap").hide();
+            }
+            extracurricularLoading = false;
+        };
+        _data.error = function(){
+            extracurricularLoading = false;
+            alert("대외활동 목록을 불러오지 못했습니다.");
+        };
+        func_ajax(_data);
     }
 
     function append_extracurricular_item(item) {
         let title = escape_html(item.title || "제목 없음");
-        let subtitle = escape_html(item.summary || item.tags || "");
-        let img = item.img && (item.img + "").trim() ? item.img : EXTRACURRICULAR_DEFAULT_IMAGE;
-        let detailUrl = item.detailUrl && (item.detailUrl + "").trim() ? item.detailUrl : "javascript:void(0);";
+        let subtitle = escape_html(item.summary || "");
+        let img = EXTRACURRICULAR_DEFAULT_IMAGE;
+        let detailUrl = item.detailUrl && (item.detailUrl + "").trim() ? item.detailUrl : EXTRACURRICULAR_DEFAULT_DETAIL_URL;
+        let encodedDetailUrl = encodeURIComponent(detailUrl);
 
         let card = ""
             + "<article class='extracurricular-card'>"
-            + "  <a class='extracurricular-link' href='" + detailUrl + "' target='_blank' rel='noopener noreferrer'>"
+            + "  <a class='extracurricular-link js-extracurricular-popup' href='" + detailUrl + "' data-popup-url='" + encodedDetailUrl + "' target='_blank' rel='noopener noreferrer'>"
             + "    <img class='extracurricular-thumb' src='" + img + "' alt='대외활동 이미지'>"
             + "    <div class='extracurricular-overlay'>"
             + "      <div class='extracurricular-subtitle'>" + subtitle + "</div>"
@@ -144,6 +127,30 @@
             + "</article>";
 
         $("#extracurricular_list").append(card);
+    }
+
+    function open_extracurricular_popup(url) {
+        let targetUrl = (url || "").trim();
+        if (!targetUrl) {
+            targetUrl = EXTRACURRICULAR_DEFAULT_DETAIL_URL;
+        }
+        const width = 1200;
+        const height = 800;
+        const left = Math.max(0, Math.round((window.screen.width - width) / 2));
+        const top = Math.max(0, Math.round((window.screen.height - height) / 2));
+        const options = "width=" + width
+            + ",height=" + height
+            + ",left=" + left
+            + ",top=" + top
+            + ",resizable=yes,scrollbars=yes";
+
+        const popup = window.open(targetUrl, "extracurricularPopup", options);
+        if (popup) {
+            popup.focus();
+            return;
+        }
+
+        window.open(targetUrl, "_blank", "noopener,noreferrer");
     }
 
     function escape_html(value) {

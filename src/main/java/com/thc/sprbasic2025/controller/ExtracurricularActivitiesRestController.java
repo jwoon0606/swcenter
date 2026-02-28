@@ -1,27 +1,29 @@
 package com.thc.sprbasic2025.controller;
 
+import com.thc.sprbasic2025.dto.ExtracurricularActivityDto;
 import com.thc.sprbasic2025.dto.DefaultDto;
-import com.thc.sprbasic2025.dto.NewsletterDto;
 import com.thc.sprbasic2025.security.PrincipalDetails;
-import com.thc.sprbasic2025.service.NewsletterService;
+import com.thc.sprbasic2025.service.ExtracurricularActivityService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Locale;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/extracurricular_activities")
 @RestController
 public class ExtracurricularActivitiesRestController {
-    private static final String EXTRACURRICULAR_CATEGORY = "extracurricular";
-
-    final NewsletterService newsletterService;
+    final ExtracurricularActivityService extracurricularActivityService;
 
     public Long getReqUserId(PrincipalDetails principalDetails) {
         if (principalDetails == null || principalDetails.getUser() == null || principalDetails.getUser().getId() == null) {
@@ -30,36 +32,66 @@ public class ExtracurricularActivitiesRestController {
         return principalDetails.getUser().getId();
     }
 
-    @PreAuthorize("permitAll()")
-    @GetMapping("/scrollList")
-    public ResponseEntity<List<NewsletterDto.DetailResDto>> scrollList(
-            NewsletterDto.ScrollListReqDto params,
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("")
+    public ResponseEntity<DefaultDto.CreateResDto> create(
+            @RequestBody ExtracurricularActivityDto.CreateReqDto params,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
         Long reqUserId = getReqUserId(principalDetails);
-        params.setCategory(EXTRACURRICULAR_CATEGORY);
-        return ResponseEntity.ok(newsletterService.scrollList(params, reqUserId));
+        return ResponseEntity.ok(extracurricularActivityService.create(params, reqUserId));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping("")
+    public ResponseEntity<Void> update(
+            @RequestBody ExtracurricularActivityDto.UpdateReqDto params,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        Long reqUserId = getReqUserId(principalDetails);
+        extracurricularActivityService.update(params, reqUserId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @DeleteMapping("")
+    public ResponseEntity<Void> delete(
+            @RequestBody DefaultDto.DeleteReqDto params,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        Long reqUserId = getReqUserId(principalDetails);
+        extracurricularActivityService.delete(params, reqUserId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @DeleteMapping("/list")
+    public ResponseEntity<Void> deleteList(
+            @RequestBody DefaultDto.DeleteListReqDto params,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        Long reqUserId = getReqUserId(principalDetails);
+        extracurricularActivityService.deleteList(params, reqUserId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PreAuthorize("permitAll()")
+    @GetMapping("/scrollList")
+    public ResponseEntity<List<ExtracurricularActivityDto.DetailResDto>> scrollList(
+            ExtracurricularActivityDto.ScrollListReqDto params,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        Long reqUserId = getReqUserId(principalDetails);
+        return ResponseEntity.ok(extracurricularActivityService.scrollList(params, reqUserId));
     }
 
     @PreAuthorize("permitAll()")
     @GetMapping("")
-    public ResponseEntity<NewsletterDto.DetailResDto> detail(
+    public ResponseEntity<ExtracurricularActivityDto.DetailResDto> detail(
             DefaultDto.DetailReqDto params,
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
         Long reqUserId = getReqUserId(principalDetails);
-        NewsletterDto.DetailResDto row = newsletterService.detail(params, reqUserId);
-        if (!isExtracurricular(row.getCategory())) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(row);
-    }
-
-    private boolean isExtracurricular(String category) {
-        if (category == null) {
-            return false;
-        }
-        String normalized = category.trim().toLowerCase(Locale.ROOT);
-        return EXTRACURRICULAR_CATEGORY.equals(normalized);
+        return ResponseEntity.ok(extracurricularActivityService.detail(params, reqUserId));
     }
 }

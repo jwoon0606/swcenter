@@ -12,7 +12,6 @@ import com.thc.sprbasic2025.util.FileUpload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,28 +66,6 @@ public class SupportProjectServiceimpl implements SupportProjectService {
         supportProjectRepository.save(targetSupportProject);
 
         return SupportProjectDto.SequenceResDto.builder().result(true).build();
-    }
-
-    @Override
-    public SupportProjectDto.SeedResDto seedSamples(Long reqUserId) {
-        permittedService.isPermitted(reqUserId, target, 110);
-
-        long seqCount = supportProjectRepository.countByDeletedFalse();
-        int createdCount = 0;
-
-        for (SupportProject sample : sampleProjects()) {
-            if (supportProjectRepository.existsByTitleAndDeletedFalse(sample.getTitle())) {
-                continue;
-            }
-            sample.setSequence((int) (++seqCount));
-            supportProjectRepository.save(sample);
-            createdCount++;
-        }
-
-        return SupportProjectDto.SeedResDto.builder()
-                .createdCount(createdCount)
-                .totalCount((int) supportProjectRepository.countByDeletedFalse())
-                .build();
     }
 
     @Override
@@ -172,34 +149,5 @@ public class SupportProjectServiceimpl implements SupportProjectService {
         }
 
         return detailList(supportProjectMapper.scrollList(param), reqUserId);
-    }
-
-    private List<SupportProject> sampleProjects() {
-        List<SupportProject> list = new ArrayList<>();
-        list.add(SupportProject.of(
-                null,
-                "AI 기반 모션 인식 맞춤형 다이어트 댄스 플랫폼",
-                "모션 인식 기반 맞춤형 다이어트 댄스 플랫폼",
-                "https://zizzy.imweb.me/",
-                "/frontswcenter/img/value-spread/sw_val_candidate1.png",
-                LocalDate.of(2025, 8, 22)
-        ));
-        list.add(SupportProject.of(
-                null,
-                "부동산 예측 알리미 가격 모아",
-                "지역별 부동산 가격 예측 정보를 제공하는 알림 서비스",
-                "https://example.com/real-estate-price",
-                "/frontswcenter/img/value-spread/sw_val_candidate2.png",
-                LocalDate.of(2024, 7, 13)
-        ));
-        list.add(SupportProject.of(
-                null,
-                "교통 약자를 위한 자연체험 매칭 플랫폼",
-                "교통 약자 대상 체험형 프로그램 매칭 플랫폼",
-                "https://example.com/forest-mate",
-                "/frontswcenter/img/value-spread/sw_val_candidate3.png",
-                LocalDate.of(2024, 10, 4)
-        ));
-        return list;
     }
 }

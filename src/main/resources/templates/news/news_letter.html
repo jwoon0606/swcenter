@@ -108,11 +108,7 @@
         _data.success = function(list){
             let rows = list || [];
             if (rows.length === 0 && newsletterCursor == null) {
-                if (is_default_filter()) {
-                    render_fallback_newsletters();
-                } else {
-                    $("#newsletter_list").html("<div class='newsletter-empty'>등록된 뉴스레터가 없습니다.</div>");
-                }
+                $("#newsletter_list").html("<div class='newsletter-empty'>등록된 뉴스레터가 없습니다.</div>");
                 $("#newsletter_load_wrap").hide();
                 newsletterLoading = false;
                 return;
@@ -138,24 +134,6 @@
             alert("뉴스레터 목록을 불러오지 못했습니다.");
         };
         func_ajax(_data);
-    }
-
-    function is_default_filter() {
-        let keyword = ($("#newsletter_keyword").val() || "").trim();
-        let category = ($("#newsletter_category").val() || "all").toLowerCase();
-        return keyword === "" && category === "all";
-    }
-
-    function render_fallback_newsletters() {
-        let samples = [
-            { id: 0, vol: 1, title: "혁신을 이끄는 리더, 홍길동의 경영 철학", tags: "#비전 #창업 계기 #혁신 #고객 신뢰 #팀 헌신 #열린 소통 #지속 가능성", category: "company", img: "", detailUrl: NEWSLETTER_DEFAULT_DETAIL_URL },
-            { id: 0, vol: 2, title: "이번주의 소식들을 집합해놓은 제목", tags: "#안에 어떤 내용들이 있는지 알려줌. #인터뷰는 무조건들어가기 때문에 #밑에 회사인지 학생인지 구분", category: "company", img: "", detailUrl: NEWSLETTER_DEFAULT_DETAIL_URL },
-            { id: 0, vol: 3, title: "이번주의 소식들을 집합해놓은 제목", tags: "#안에 어떤 내용들이 있는지 알려줌. #인터뷰는 무조건들어가기 때문에 #밑에 회사인지 학생인지 구분", category: "company", img: "", detailUrl: NEWSLETTER_DEFAULT_DETAIL_URL },
-            { id: 0, vol: 4, title: "이번주의 소식들을 집합해놓은 제목", tags: "#안에 어떤 내용들이 있는지 알려줌. #인터뷰는 무조건들어가기 때문에 #밑에 회사인지 학생인지 구분", category: "company", img: "", detailUrl: NEWSLETTER_DEFAULT_DETAIL_URL }
-        ];
-        for (let each of samples) {
-            append_newsletter_item(each);
-        }
     }
 
     function append_newsletter_item(item) {

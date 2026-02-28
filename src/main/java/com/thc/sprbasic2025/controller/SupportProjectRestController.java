@@ -34,15 +34,6 @@ public class SupportProjectRestController {
         return ResponseEntity.ok(supportProjectService.sequence(params, reqUserId));
     }
 
-    @PreAuthorize("hasRole('USER')")
-    @PostMapping("/seedSamples")
-    public ResponseEntity<SupportProjectDto.SeedResDto> seedSamples(
-            @AuthenticationPrincipal PrincipalDetails principalDetails
-    ) {
-        Long reqUserId = getReqUserId(principalDetails);
-        return ResponseEntity.ok(supportProjectService.seedSamples(reqUserId));
-    }
-
     public Long getReqUserId(PrincipalDetails principalDetails) {
         if (principalDetails == null || principalDetails.getUser() == null || principalDetails.getUser().getId() == null) {
             return null;

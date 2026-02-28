@@ -9,7 +9,6 @@ import java.util.List;
 @Service
 public interface SupportProjectService {
     SupportProjectDto.SequenceResDto sequence(SupportProjectDto.SequenceReqDto param, Long reqUserId);
-    SupportProjectDto.SeedResDto seedSamples(Long reqUserId);
 
     DefaultDto.CreateResDto create(SupportProjectDto.CreateReqDto param, Long reqUserId);
     void update(SupportProjectDto.UpdateReqDto param, Long reqUserId);
