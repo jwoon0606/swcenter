@@ -2,6 +2,7 @@
 <html lang="ko">
 <th:block th:replace="~{includes/user/head}" />
 <link rel="stylesheet" href="/frontswcenter/css/aside.css">
+<link rel="stylesheet" href="/frontswcenter/css/support-project.css">
 <body>
 
 <th:block th:replace="~{includes/user/header}" />
@@ -10,18 +11,119 @@
     <th:block th:replace="~{includes/user/aside}" />
     <script> listener_aside_nav_active("value-spread", 1); </script>
 
-    <main class="content-area">
-        <h1 class="page-title">지원 프로젝트</h1>
+    <main class="content-area support-project-page">
 
-        <div class="content-box">
-            콘텐츠를 준비 중입니다.
-        </div>
+        <section id="support_project_grid" class="support-project-grid"></section>
 
+        <section id="support_project_empty" class="support-project-empty" style="display:none;">
+            등록된 지원 프로젝트가 없습니다.
+        </section>
     </main>
 </div>
 
 <th:block th:replace="~{includes/user/footer}" />
 <th:block th:replace="~{includes/user/bottom}" />
+
+<script>
+    const SUPPORT_PROJECT_FALLBACK_IMAGES = [
+        "/frontswcenter/img/value-spread/test00.png",
+        "/frontswcenter/img/value-spread/test500_0.png",
+        "/frontswcenter/img/value-spread/test500b.png"
+    ];
+
+    function supportProjectFallbackImage(index) {
+        return SUPPORT_PROJECT_FALLBACK_IMAGES[index % SUPPORT_PROJECT_FALLBACK_IMAGES.length];
+    }
+
+    function supportProjectDateText(item) {
+        if (item && item.publishedDate) {
+            return String(item.publishedDate).slice(0, 10);
+        }
+        if (item && item.createdAt) {
+            return String(item.createdAt).slice(0, 10);
+        }
+        return "-";
+    }
+
+    function supportProjectEscapeHtml(value) {
+        return $("<div>").text(value == null ? "" : String(value)).html();
+    }
+
+    function supportProjectCardHtml(item, index) {
+        const projectId = item && item.id ? Number(item.id) : 0;
+        const detailHref = projectId > 0 ? "/value-spread/support_project/" + projectId : "#";
+        const titleText = item && item.title ? item.title : "지원 프로젝트";
+        const title = supportProjectEscapeHtml(titleText);
+        const date = supportProjectEscapeHtml(supportProjectDateText(item));
+        const imgSrc = supportProjectEscapeHtml((item && item.img) ? item.img : supportProjectFallbackImage(index));
+        const fallbackImg = supportProjectEscapeHtml(supportProjectFallbackImage(index));
+        const ariaLabel = supportProjectEscapeHtml(titleText + " 상세 보기");
+
+        return ""
+            + '<article class="support-project-card">'
+            +   '<div class="support-project-date">' + date + '</div>'
+            +   '<a class="support-project-thumb-link" href="' + detailHref + '" aria-label="' + ariaLabel + '">'
+            +       '<img class="support-project-thumb" src="' + imgSrc + '" alt="' + title + '" loading="lazy" data-fallback="' + fallbackImg + '" />'
+            +   '</a>'
+            +   '<a class="support-project-title" href="' + detailHref + '">' + title + '</a>'
+            + '</article>';
+    }
+
+    function supportProjectAttachImageFallback() {
+        const images = document.querySelectorAll(".support-project-thumb");
+        images.forEach(function(image) {
+            image.onerror = function() {
+                if (this.dataset.fallback && this.src !== this.dataset.fallback) {
+                    this.src = this.dataset.fallback;
+                    return;
+                }
+                this.onerror = null;
+            };
+        });
+    }
+
+    function supportProjectShowEmpty(message) {
+        $("#support_project_grid").hide().empty();
+        $("#support_project_empty").text(message).show();
+    }
+
+    function supportProjectRender(list) {
+        const activeList = (list || []).filter(function(item) {
+            return item && item.deleted !== true;
+        });
+
+        if (activeList.length === 0) {
+            supportProjectShowEmpty("등록된 지원 프로젝트가 없습니다.");
+            return;
+        }
+
+        const html = activeList.map(function(item, index) {
+            return supportProjectCardHtml(item, index);
+        }).join("");
+
+        $("#support_project_grid").html(html).show();
+        $("#support_project_empty").hide();
+        supportProjectAttachImageFallback();
+    }
+
+    function searchSupportProjectList() {
+        let _data = new Map();
+        _data.url = "/api/support_project/list";
+        _data.type = "GET";
+        _data.param = { deleted: false };
+        _data.success = function(obj_data) {
+            supportProjectRender(Array.isArray(obj_data) ? obj_data : []);
+        };
+        _data.error = function() {
+            supportProjectShowEmpty("지원 프로젝트를 불러오지 못했습니다.");
+        };
+        func_ajax(_data);
+    }
+
+    $(document).ready(function() {
+        searchSupportProjectList();
+    });
+</script>
 
 </body>
 </html>
