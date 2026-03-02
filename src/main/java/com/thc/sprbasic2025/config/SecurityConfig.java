@@ -49,7 +49,8 @@ public class SecurityConfig {
 		http.headers(headers -> headers
 				.frameOptions(frameOptions -> frameOptions.sameOrigin())
 				.crossOriginOpenerPolicy(crossOriginOpenerPolicy -> crossOriginOpenerPolicy
-						.policy(CrossOriginOpenerPolicyHeaderWriter.CrossOriginOpenerPolicy.SAME_ORIGIN_ALLOW_POPUPS))
+						// Google Sign-In popup postMessage 이슈를 피하기 위해 로그인 플로우와 충돌 없는 값으로 설정
+						.policy(CrossOriginOpenerPolicyHeaderWriter.CrossOriginOpenerPolicy.UNSAFE_NONE))
 		);
 		http
 				.csrf(AbstractHttpConfigurer::disable)

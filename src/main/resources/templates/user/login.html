@@ -48,7 +48,7 @@
         $.ajax({
             url: "/api/user/google",
             method: "POST",
-            contentType : 'application/json; charset=utf-8',
+            contentType : 'text/plain; charset=utf-8',
             data: idToken,
             success: (data, status, xhr)=>{
                 let refreshToken = xhr.getResponseHeader("RefreshToken");

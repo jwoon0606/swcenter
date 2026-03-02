@@ -13,7 +13,10 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
-@Table(indexes = {@Index(columnList = "deleted, username, email, rfrom")})
+@Table(indexes = {
+        @Index(name = "idx_user_deleted", columnList = "deleted"),
+        @Index(name = "idx_user_rfrom", columnList = "rfrom")
+})
 @Entity
 public class User extends AuditingFields{
     @Column(length = 100, unique = true) String username;
