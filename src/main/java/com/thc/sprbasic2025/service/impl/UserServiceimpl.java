@@ -25,10 +25,12 @@ import com.thc.sprbasic2025.security.ExternalProperties;
 import com.thc.sprbasic2025.service.PermittedService;
 import com.thc.sprbasic2025.service.UserService;
 import com.thc.sprbasic2025.util.MailBox;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.net.HttpURLConnection;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -37,6 +39,8 @@ import java.util.regex.Pattern;
 public class UserServiceimpl implements UserService {
 
     final String target = "user";
+    private static final int GOOGLE_VERIFY_CONNECT_TIMEOUT_MS = 5000;
+    private static final int GOOGLE_VERIFY_READ_TIMEOUT_MS = 5000;
 
     final UserRepository userRepository;
     final PermissionRepository permissionRepository;
@@ -49,22 +53,33 @@ public class UserServiceimpl implements UserService {
     final PermittedService permittedService;
     final MailBox mailBox;
     final ExternalProperties externalProperties;
+    private GoogleIdTokenVerifier googleIdTokenVerifier;
+
+    @PostConstruct
+    public void initGoogleVerifier() {
+        HttpTransport transport = new NetHttpTransport.Builder()
+                .setConnectionFactory(url -> {
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setConnectTimeout(GOOGLE_VERIFY_CONNECT_TIMEOUT_MS);
+                    connection.setReadTimeout(GOOGLE_VERIFY_READ_TIMEOUT_MS);
+                    return connection;
+                })
+                .build();
+        JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
+
+        googleIdTokenVerifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
+                .setAudience(Collections.singletonList(externalProperties.getGoogleClientId()))
+                .build();
+    }
 
     @Override
     public String google(String idTokenString) {
-        HttpTransport transport = new NetHttpTransport();
-        JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
-
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
-                .setAudience(Collections.singletonList(externalProperties.getGoogleClientId()))
-                .build();
-
         String googleSub = null;
         String name = null;
         String email = null;
 
         try {
-            GoogleIdToken idToken = verifier.verify(idTokenString);
+            GoogleIdToken idToken = googleIdTokenVerifier.verify(idTokenString);
             if (idToken == null) {
                 throw new RuntimeException("Invalid Google ID token");
             }
@@ -73,7 +88,7 @@ public class UserServiceimpl implements UserService {
             email = payload.getEmail();
             name = (String) payload.get("name");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Google token verification failed", e);
         }
 
         if (googleSub == null) {
