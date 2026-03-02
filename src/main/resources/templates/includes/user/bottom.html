@@ -24,22 +24,28 @@
 
     function load_admin_link_visibility(){
         $("#topbar_admin_link").hide();
-        let _data = new Map();
-        _data.url = "/api/permissiondetail/allow";
-        _data.type = "POST";
-        _data.param = {
-            target: "admin",
-            func: 200
-        };
-        _data.success = function(obj_data){
-            if(obj_data != null && obj_data.allowed === true){
-                $("#topbar_admin_link").show();
+        $.ajax({
+            url: "/api/permissiondetail/allow",
+            type: "POST",
+            headers: {
+                "Authorization": localStorage.getItem("accessToken")
+            },
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                target: "admin",
+                func: 200
+            }),
+            success: function(obj_data){
+                if(obj_data != null && obj_data.allowed === true){
+                    $("#topbar_admin_link").show();
+                } else {
+                    $("#topbar_admin_link").hide();
+                }
+            },
+            error: function(){
+                $("#topbar_admin_link").hide();
             }
-        };
-        _data.error = function(){
-            $("#topbar_admin_link").hide();
-        };
-        func_ajax(_data);
+        });
     }
 </script>
 
