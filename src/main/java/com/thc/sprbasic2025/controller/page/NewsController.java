@@ -36,6 +36,10 @@ public class NewsController {
 
     @RequestMapping("/news_letter/detail/{id}")
     public String newsletterDetail(@PathVariable String id) {
+        if (id.startsWith("vol")) {
+            int volNo = Integer.parseInt(id.replace("vol", ""));
+            return String.format("news/newsletter_vol/newsletter_vol%02d", volNo);
+        }
         return "news/news_letter_detail";
     }
 
