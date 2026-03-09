@@ -111,7 +111,7 @@
     function append_extracurricular_item(item) {
         let title = escape_html(item.title || "제목 없음");
         let subtitle = escape_html(item.summary || "");
-        let img = EXTRACURRICULAR_DEFAULT_IMAGE;
+        let img = item.img && (item.img + "").trim() ? item.img : EXTRACURRICULAR_DEFAULT_IMAGE;
         let detailUrl = item.detailUrl && (item.detailUrl + "").trim() ? item.detailUrl : EXTRACURRICULAR_DEFAULT_DETAIL_URL;
         let encodedDetailUrl = encodeURIComponent(detailUrl);
 

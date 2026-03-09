@@ -116,6 +116,8 @@
                     <div class="form-group col-md-6">
                         <label for="edit_newsletter_img">이미지 URL</label>
                         <input id="edit_newsletter_img" type="text" class="form-control" placeholder="/image/... 또는 https://...">
+                        <input type="file" class="form-control mt-2" id="newsletter_img" accept="image/*" onchange="listenerSetImage(this, listener_upload_newsletter_img)" />
+                        <img class="hide mt-2" id="img_newsletter_img" style="height: 75px;" alt="뉴스레터 이미지" />
                     </div>
                 </div>
                 <div class="form-group">
@@ -160,6 +162,9 @@
                 e.preventDefault();
                 add_edit_newsletter_category_from_input();
             }
+        });
+        $("#edit_newsletter_img").on("input", function(){
+            sync_newsletter_img_preview_from_input();
         });
         resolve_newsletter_manage_permission(function(){
             reload_newsletter_admin();
@@ -279,6 +284,8 @@
         $("#edit_newsletter_title").val("");
         set_edit_newsletter_categories("");
         $("#edit_newsletter_img").val("");
+        $("#newsletter_img").val("");
+        sync_newsletter_img_preview("");
         $("#edit_newsletter_detail_url").val("");
         $("#edit_newsletter_summary").val("");
         $("#newsletterEditModal").modal("show");
@@ -299,9 +306,57 @@
         $("#edit_newsletter_title").val(row.title || "");
         set_edit_newsletter_categories(row.category || "");
         $("#edit_newsletter_img").val(row.img || "");
+        $("#newsletter_img").val("");
+        sync_newsletter_img_preview(row.img || "");
         $("#edit_newsletter_detail_url").val(row.detailUrl || "");
         $("#edit_newsletter_summary").val(row.summary || "");
         $("#newsletterEditModal").modal("show");
+    }
+
+    function listener_upload_newsletter_img(){
+        let tempFile = null;
+        let inputFile = document.getElementById("newsletter_img");
+        if (inputFile.files.length > 0) {
+            tempFile = inputFile.files[0];
+        }
+        if (tempFile == null) {
+            return;
+        }
+
+        let fileData = new FormData();
+        fileData.append("file", tempFile);
+        $.ajax({
+            url: "/api/default/uploadFile",
+            type: "POST",
+            data: fileData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: (data)=>{
+                let imagePath = "/image/" + data;
+                $("#edit_newsletter_img").val(imagePath);
+                sync_newsletter_img_preview(imagePath);
+            },
+            error: ()=>{
+                alert("이미지 업로드에 실패했습니다.");
+            }
+        });
+    }
+
+    function sync_newsletter_img_preview_from_input(){
+        sync_newsletter_img_preview($("#edit_newsletter_img").val());
+    }
+
+    function sync_newsletter_img_preview(url){
+        let value = (url || "").trim();
+        let preview = $("#img_newsletter_img");
+        if(!value){
+            preview.attr("src", "");
+            preview.addClass("hide");
+            return;
+        }
+        preview.attr("src", value);
+        preview.removeClass("hide");
     }
 
     function save_newsletter_admin(){

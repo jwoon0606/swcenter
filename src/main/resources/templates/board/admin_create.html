@@ -32,20 +32,46 @@
                 <div class="mb-4">
                     <div class="form-group row">
 
-                        <label class="col-sm-2 col-form-label">*사용자id</label>
-                        <div class="col-sm-4">
-                            <input type="text" class="input_param input_required form-control mb-2" id="create_board_userId" name="userId" placeholder="내용을 입력해주세요!" />
-                        </div>
-                        <label class="col-sm-6"></label>
                         <label class="col-sm-2 col-form-label">*제목</label>
                         <div class="col-sm-4">
                             <input type="text" class="input_param input_required form-control mb-2" id="create_board_title" name="title" placeholder="내용을 입력해주세요!" />
                         </div>
                         <label class="col-sm-6"></label>
 
+                        <label class="col-sm-2 col-form-label">*주제</label>
+                        <div class="col-sm-4">
+                            <select class="input_param input_required form-control mb-2" id="create_board_subject" name="subject">
+                                <option value="일상">일상</option>
+                                <option value="자유" selected>자유</option>
+                                <option value="고민">고민</option>
+                                <option value="시사">시사</option>
+                                <option value="기술트랜드">기술트랜드</option>
+                                <option value="작가">작가</option>
+                                <option value="영화 후기">영화 후기</option>
+                                <option value="수필">수필</option>
+                            </select>
+                        </div>
+                        <label class="col-sm-6"></label>
+
+                        <label class="col-sm-2 col-form-label">작성자 공개</label>
+                        <div class="col-sm-4">
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="create_board_anonymous" name="anonymous" />
+                                <label class="form-check-label" for="create_board_anonymous">익명으로 작성</label>
+                            </div>
+                            <small class="form-text text-muted" id="anonymous_status_text">현재 작성자 이름이 표시됩니다.</small>
+                        </div>
+                        <label class="col-sm-6"></label>
+
                         <label class="col-sm-2 col-form-label">내용</label>
                         <div class="col-sm-10">
                             <textarea class="input_param form-control mb-2" id="create_board_content" name="content" placeholder="내용을 입력해주세요!" ></textarea>
+                        </div>
+
+                        <label class="col-sm-2 col-form-label">메인 이미지</label>
+                        <div class="col-sm-10">
+                            <input type="file" id="create_board_img" accept="image/*" onchange="listenerSetImage(this, null)" />
+                            <img class="hide mt-2" id="img_create_board_img" style="height: 75px;" alt="메인 사진" />
                         </div>
                     </div>
                 </div>
@@ -68,22 +94,57 @@
 
 <script>
     $( document ).ready(function() {
-        console.log( "ready!" );
+        $("#create_board_anonymous").on("change", sync_anonymous_status_text);
+        sync_anonymous_status_text();
     });
+
     function create_board(){
-        let _param = listenerCreateParam();
+        let title = ($("#create_board_title").val() || "").trim();
+        if (!title) {
+            alert("제목을 입력해주세요.");
+            return;
+        }
+        let _param = {
+            title: title,
+            content: $("#create_board_content").val(),
+            subject: ($("#create_board_subject").val() || "자유").trim(),
+            anonymous: $("#create_board_anonymous").is(":checked")
+        };
+        let tempFile = null;
+        let inputFile = document.getElementById("create_board_img");
+        if (inputFile && inputFile.files.length > 0) {
+            tempFile = inputFile.files[0];
+        }
+        let formData = new FormData();
+        if (tempFile != null) {
+            formData.append("file", tempFile);
+        }
+        formData.append("params", new Blob([JSON.stringify(_param)], {
+            type: "application/json; charset=utf-8"
+        }));
+
         let _data = {};
         _data.url = "/api/board";
         _data.type = "POST";
-        _data.param = _param;
+        _data.param = formData;
+        _data.contentType = false;
         _data.success = function(obj_data, obj_status, obj_xhr){
             alert("등록 성공");
-            location.reload();
+            location.href = "/board/admin_list";
         }
         _data.error = function(obj_data, obj_status, obj_xhr){
             alert("정상적으로 이루어지지 않았습니다. 다시 시도해주세요.");
         }
         func_ajax(_data);
+    }
+
+    function sync_anonymous_status_text() {
+        let anonymousChecked = $("#create_board_anonymous").is(":checked");
+        $("#anonymous_status_text").text(
+            anonymousChecked
+                ? "현재 익명으로 표시됩니다."
+                : "현재 작성자 이름이 표시됩니다."
+        );
     }
 </script>
 

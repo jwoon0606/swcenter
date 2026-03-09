@@ -117,6 +117,7 @@ public class ExtracurricularActivityServiceimpl implements ExtracurricularActivi
                 .modifiedAt(row.getModifiedAt())
                 .title(row.getTitle())
                 .summary(row.getSummary())
+                .img(row.getImg())
                 .detailUrl(safeDetailUrl(row.getDetailUrl()))
                 .build();
     }

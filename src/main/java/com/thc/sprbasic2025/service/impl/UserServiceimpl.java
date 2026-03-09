@@ -27,10 +27,15 @@ import com.thc.sprbasic2025.service.UserService;
 import com.thc.sprbasic2025.util.MailBox;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -38,9 +43,12 @@ import java.util.regex.Pattern;
 @Service
 public class UserServiceimpl implements UserService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceimpl.class);
     final String target = "user";
-    private static final int GOOGLE_VERIFY_CONNECT_TIMEOUT_MS = 5000;
-    private static final int GOOGLE_VERIFY_READ_TIMEOUT_MS = 5000;
+    private static final int GOOGLE_VERIFY_CONNECT_TIMEOUT_MS = 12000;
+    private static final int GOOGLE_VERIFY_READ_TIMEOUT_MS = 12000;
+    private static final int GOOGLE_VERIFY_MAX_ATTEMPTS = 2;
+    private static final long GOOGLE_VERIFY_RETRY_DELAY_MS = 300L;
 
     final UserRepository userRepository;
     final PermissionRepository permissionRepository;
@@ -79,7 +87,7 @@ public class UserServiceimpl implements UserService {
         String email = null;
 
         try {
-            GoogleIdToken idToken = googleIdTokenVerifier.verify(idTokenString);
+            GoogleIdToken idToken = verifyGoogleIdTokenWithRetry(idTokenString);
             if (idToken == null) {
                 throw new RuntimeException("Invalid Google ID token");
             }
@@ -125,6 +133,42 @@ public class UserServiceimpl implements UserService {
 
         ensureStudentPermissionAssigned(id);
         return authService.createRefreshToken(id);
+    }
+
+    private GoogleIdToken verifyGoogleIdTokenWithRetry(String idTokenString) throws Exception {
+        Exception lastException = null;
+        for (int attempt = 1; attempt <= GOOGLE_VERIFY_MAX_ATTEMPTS; attempt++) {
+            try {
+                return googleIdTokenVerifier.verify(idTokenString);
+            } catch (Exception e) {
+                lastException = e;
+                if (!isRetryableGoogleVerifyException(e) || attempt == GOOGLE_VERIFY_MAX_ATTEMPTS) {
+                    break;
+                }
+                logger.warn("Google ID token verify transient failure. retry={}/{}", attempt, GOOGLE_VERIFY_MAX_ATTEMPTS, e);
+                try {
+                    Thread.sleep(GOOGLE_VERIFY_RETRY_DELAY_MS);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        }
+        throw lastException;
+    }
+
+    private boolean isRetryableGoogleVerifyException(Throwable throwable) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (current instanceof SocketTimeoutException
+                    || current instanceof ConnectException
+                    || current instanceof UnknownHostException
+                    || current instanceof java.io.IOException) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 
     private void ensureStudentPermissionAssigned(Long userId) {

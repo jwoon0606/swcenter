@@ -86,6 +86,12 @@
                     <input id="edit_extracurricular_title" type="text" class="form-control" placeholder="제목을 입력하세요">
                 </div>
                 <div class="form-group">
+                    <label for="edit_extracurricular_img">이미지 URL</label>
+                    <input id="edit_extracurricular_img" type="text" class="form-control" placeholder="/image/... 또는 https://...">
+                    <input type="file" class="form-control mt-2" id="extracurricular_img" accept="image/*" onchange="listenerSetImage(this, listener_upload_extracurricular_img)" />
+                    <img class="hide mt-2" id="img_extracurricular_img" style="height: 75px;" alt="대외활동 이미지" />
+                </div>
+                <div class="form-group">
                     <label for="edit_extracurricular_detail_url">상세 URL</label>
                     <input id="edit_extracurricular_detail_url" type="text" class="form-control" placeholder="https://...">
                 </div>
@@ -113,6 +119,9 @@
             if(e.key === "Enter"){
                 reload_extracurricular_admin();
             }
+        });
+        $("#edit_extracurricular_img").on("input", function(){
+            sync_extracurricular_img_preview_from_input();
         });
         resolve_extracurricular_manage_permission(function(){
             reload_extracurricular_admin();
@@ -222,6 +231,9 @@
         }
         $("#edit_extracurricular_id").val("");
         $("#edit_extracurricular_title").val("");
+        $("#edit_extracurricular_img").val("");
+        $("#extracurricular_img").val("");
+        sync_extracurricular_img_preview("");
         $("#edit_extracurricular_detail_url").val("");
         $("#edit_extracurricular_summary").val("");
         $("#extracurricularEditModal").modal("show");
@@ -239,9 +251,58 @@
         }
         $("#edit_extracurricular_id").val(row.id || "");
         $("#edit_extracurricular_title").val(row.title || "");
+        $("#edit_extracurricular_img").val(row.img || "");
+        $("#extracurricular_img").val("");
+        sync_extracurricular_img_preview(row.img || "");
         $("#edit_extracurricular_detail_url").val(row.detailUrl || "");
         $("#edit_extracurricular_summary").val(row.summary || "");
         $("#extracurricularEditModal").modal("show");
+    }
+
+    function listener_upload_extracurricular_img(){
+        let tempFile = null;
+        let inputFile = document.getElementById("extracurricular_img");
+        if (inputFile.files.length > 0) {
+            tempFile = inputFile.files[0];
+        }
+        if (tempFile == null) {
+            return;
+        }
+
+        let fileData = new FormData();
+        fileData.append("file", tempFile);
+        $.ajax({
+            url: "/api/default/uploadFile",
+            type: "POST",
+            data: fileData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: (data)=>{
+                let imagePath = "/image/" + data;
+                $("#edit_extracurricular_img").val(imagePath);
+                sync_extracurricular_img_preview(imagePath);
+            },
+            error: ()=>{
+                alert("이미지 업로드에 실패했습니다.");
+            }
+        });
+    }
+
+    function sync_extracurricular_img_preview_from_input(){
+        sync_extracurricular_img_preview($("#edit_extracurricular_img").val());
+    }
+
+    function sync_extracurricular_img_preview(url){
+        let value = (url || "").trim();
+        let preview = $("#img_extracurricular_img");
+        if(!value){
+            preview.attr("src", "");
+            preview.addClass("hide");
+            return;
+        }
+        preview.attr("src", value);
+        preview.removeClass("hide");
     }
 
     function save_extracurricular_admin(){
@@ -259,6 +320,7 @@
 
         let payload = {
             title: title,
+            img: ($("#edit_extracurricular_img").val() || "").trim(),
             detailUrl: ($("#edit_extracurricular_detail_url").val() || "").trim(),
             summary: ($("#edit_extracurricular_summary").val() || "").trim()
         };

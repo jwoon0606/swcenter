@@ -15,12 +15,14 @@ public class ExtracurricularActivityDto {
     public static class CreateReqDto {
         String title;
         String summary;
+        String img;
         String detailUrl;
 
         public ExtracurricularActivity toEntity() {
             return ExtracurricularActivity.of(
                     getTitle(),
                     getSummary(),
+                    getImg(),
                     getDetailUrl()
             );
         }
@@ -30,6 +32,7 @@ public class ExtracurricularActivityDto {
     public static class UpdateReqDto extends DefaultDto.UpdateReqDto {
         String title;
         String summary;
+        String img;
         String detailUrl;
     }
 
@@ -37,6 +40,7 @@ public class ExtracurricularActivityDto {
     public static class DetailResDto extends DefaultDto.DetailResDto {
         String title;
         String summary;
+        String img;
         String detailUrl;
     }
 

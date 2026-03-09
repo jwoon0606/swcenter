@@ -20,6 +20,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class ExtracurricularActivity extends AuditingFields {
     String title;
     String summary;
+    String img;
     String detailUrl;
 
     protected ExtracurricularActivity() {}
@@ -27,19 +28,22 @@ public class ExtracurricularActivity extends AuditingFields {
     private ExtracurricularActivity(
             String title,
             String summary,
+            String img,
             String detailUrl
     ) {
         this.title = title;
         this.summary = summary;
+        this.img = img;
         this.detailUrl = detailUrl;
     }
 
     public static ExtracurricularActivity of(
             String title,
             String summary,
+            String img,
             String detailUrl
     ) {
-        return new ExtracurricularActivity(title, summary, detailUrl);
+        return new ExtracurricularActivity(title, summary, img, detailUrl);
     }
 
     public DefaultDto.CreateResDto toCreateResDto() {
@@ -50,6 +54,7 @@ public class ExtracurricularActivity extends AuditingFields {
         if (param.getDeleted() != null) { setDeleted(param.getDeleted()); }
         if (param.getTitle() != null) { setTitle(param.getTitle()); }
         if (param.getSummary() != null) { setSummary(param.getSummary()); }
+        if (param.getImg() != null) { setImg(param.getImg()); }
         if (param.getDetailUrl() != null) { setDetailUrl(param.getDetailUrl()); }
     }
 }

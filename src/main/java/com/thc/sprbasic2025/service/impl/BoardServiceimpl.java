@@ -27,7 +27,10 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Service
 public class BoardServiceimpl implements BoardService {
-    private static final Set<String> ALLOWED_SUBJECTS = new HashSet<>(Arrays.asList("일상", "자유", "고민"));
+    private static final Set<String> ALLOWED_SUBJECTS = new HashSet<>(Arrays.asList(
+            "일상", "자유", "고민",
+            "시사", "기술트랜드", "작가", "영화 후기", "수필"
+    ));
     private static final String DEFAULT_SUBJECT = "자유";
 
     final String target = "board";
