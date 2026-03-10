@@ -110,6 +110,18 @@ public class BoardServiceimpl implements BoardService {
         if (res.getAnonymous() == null) {
             res.setAnonymous(false);
         }
+
+        //익명일때는, 글쓴사람 userId도 노출 안함!!
+        if(res.getAnonymous()){
+            // 근데 관리자인 경우에는 괜찮아!
+            if(!permittedService.permitted(PermissionDto.PermittedReqDto.builder().userId(reqUserId).target(target).func(200).build())){
+                res.setUserId(null);
+                res.setUserNick(null);
+                res.setUserUsername(null);
+                res.setUserImg(null);
+            }
+        }
+
         res.setCanUpdate(canManageBoard(reqUserId, res.getUserId()));
         return res;
     }
