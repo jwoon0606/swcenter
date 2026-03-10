@@ -82,12 +82,36 @@
                         <label class="col-sm-2 col-form-label">키워드</label>
                         <div class="col-sm-4">
                             <select class="form-control mb-2" id="search_support_project_keyword" onchange="set_search_keyword('support_project')">
-                                <option value="10" selected="selected">이름</option>
+                                <option value="10" selected="selected">프로젝트명</option>
                             </select>
                         </div>
                         <div class="col-sm-6">
                             <input id="search_support_project_title" onchange="listener_support_project_keyword_changed();"
-                                   class="form-control search_support_project_keyword_each search_support_project_keyword_each_10 mb-2" type="text" placeholder="내용을 입력하세요"/>
+                                   class="form-control search_support_project_keyword_each search_support_project_keyword_each_10 mb-2" type="text" placeholder="프로젝트명을 입력하세요"/>
+                        </div>
+
+                        <input type="hidden" id="cursor_support_project" />
+                        <label class="col-sm-2 col-form-label">검색 기준</label>
+                        <div class="col-sm-2">
+                            <select class="form-control" id="search_support_project_orderby" onchange="listener_support_project_keyword_changed();">
+                                <option value="id" selected="selected">등록순</option>
+                                <option value="title">제목순</option>
+                            </select>
+                        </div>
+                        <label class="col-sm-2 col-form-label">한번에 불러올 갯수</label>
+                        <div class="col-sm-2">
+                            <select class="form-control" id="search_support_project_perpage" onchange="listener_support_project_keyword_changed();">
+                                <option value="10" selected="selected">10</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <label class="col-sm-2 col-form-label">조회방향</label>
+                        <div class="col-sm-2">
+                            <select class="form-control" id="search_support_project_orderway" onchange="listener_support_project_keyword_changed();">
+                                <option value="DESC" selected="selected">역방향</option>
+                                <option value="ASC">정방향</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -116,6 +140,7 @@
                     </table>
                     <div class="w-100 m-auto">
                         <button class="btn btn-danger" onclick="delete_support_project(); return false;">삭제</button>
+                        <button class="btn btn-primary" onclick="search_support_project(); return false;">더보기</button>
                     </div>
                 </div>
 
@@ -140,14 +165,19 @@
 <script>
     function listener_support_project_keyword_changed(){
         $("#input_support_project_keyword_changed").val("1");
+        $("#tbody_support_project_list").html("");
         search_support_project();
     }
 
     function search_support_project() {
         let _data = new Map();
-        _data.url = "/api/support_project/list";
+        _data.url = "/api/support_project/scrollList";
         _data.type = "GET";
         _data.param = {
+            perpage: $("#search_support_project_perpage").val(),
+            orderby: $("#search_support_project_orderby").val(),
+            orderway: $("#search_support_project_orderway").val(),
+            cursor: listenerGetCursor("support_project"),
             sdate: $("#search_support_project_sdate").val(),
             fdate: $("#search_support_project_fdate").val(),
             deleted: listenerGetBooleanFromSelect("search_support_project_deleted"),
@@ -158,7 +188,6 @@
             if(input_support_project_keyword_changed === "1"){
                 $("#input_support_project_keyword_changed").val("");
             }
-            $("#tbody_support_project_list").html("");
             let tempList = obj_data || [];
             for (let each of tempList) {
                 let tList = [];

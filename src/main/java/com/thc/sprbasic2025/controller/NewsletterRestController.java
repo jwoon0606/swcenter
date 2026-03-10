@@ -103,6 +103,27 @@ public class NewsletterRestController {
         return ResponseEntity.ok(newsletterService.scrollList(params, reqUserId));
     }
 
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/subscriber/scrollList")
+    public ResponseEntity<List<NewsletterDto.SubscriberDetailResDto>> subscriberScrollList(
+            NewsletterDto.SubscriberScrollListReqDto params,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        Long reqUserId = getReqUserId(principalDetails);
+        return ResponseEntity.ok(newsletterService.subscriberScrollList(params, reqUserId));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping("/subscriber")
+    public ResponseEntity<Void> updateSubscriber(
+            @RequestBody NewsletterDto.SubscriberUpdateReqDto params,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        Long reqUserId = getReqUserId(principalDetails);
+        newsletterService.updateSubscriber(params, reqUserId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @PreAuthorize("permitAll()")
     @PostMapping("/subscribe")
     public ResponseEntity<NewsletterDto.SubscribeResDto> subscribe(

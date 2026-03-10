@@ -66,8 +66,7 @@ public class NoticeRestController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    //@PreAuthorize("permitAll()")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("permitAll()")
     @GetMapping("")
     public ResponseEntity<NoticeDto.DetailResDto> detail(DefaultDto.DetailReqDto params
             , @AuthenticationPrincipal PrincipalDetails principalDetails){
@@ -75,7 +74,7 @@ public class NoticeRestController {
         return ResponseEntity.ok(noticeService.detail(params, reqUserId));
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("permitAll()")
     @PostMapping("/view")
     public ResponseEntity<NoticeDto.MetricsResDto> view(@RequestBody DefaultDto.DetailReqDto params
             , @AuthenticationPrincipal PrincipalDetails principalDetails){
@@ -91,7 +90,7 @@ public class NoticeRestController {
         return ResponseEntity.ok(noticeService.updateLikeCount(params, reqUserId));
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("permitAll()")
     @GetMapping("/comment/list")
     public ResponseEntity<List<NoticeDto.CommentResDto>> commentList(DefaultDto.DetailReqDto params
             , @AuthenticationPrincipal PrincipalDetails principalDetails){
@@ -140,14 +139,14 @@ public class NoticeRestController {
         Long reqUserId = getReqUserId(principalDetails);
         return ResponseEntity.ok(noticeService.list(params, reqUserId));
     }
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("permitAll()")
     @GetMapping("/pagedList")
     public ResponseEntity<DefaultDto.PagedListResDto> pagedList(NoticeDto.PagedListReqDto params, @AuthenticationPrincipal PrincipalDetails principalDetails){
         Long reqUserId = getReqUserId(principalDetails);
         logger.info("reqUserId : " + reqUserId);
         return ResponseEntity.ok(noticeService.pagedList(params, reqUserId));
     }
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("permitAll()")
     @GetMapping("/scrollList")
     public ResponseEntity<List<NoticeDto.DetailResDto>> scrollList(NoticeDto.ScrollListReqDto params, @AuthenticationPrincipal PrincipalDetails principalDetails){
         Long reqUserId = getReqUserId(principalDetails);

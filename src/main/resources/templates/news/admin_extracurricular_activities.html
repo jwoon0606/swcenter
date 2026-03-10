@@ -21,32 +21,81 @@
                 <h1 class="h3 mb-2 text-gray-800">대외활동 관리</h1>
                 <p class="mb-4">대외활동 목록 조회, 등록, 수정, 삭제를 관리합니다.</p>
 
-                <div class="card shadow mb-3">
-                    <div class="card-body">
-                        <div class="form-row">
-                            <div class="col-md-6 mb-2">
-                                <label for="search_extracurricular_keyword">검색어</label>
-                                <input id="search_extracurricular_keyword" type="text" class="form-control" placeholder="제목/요약 검색">
-                            </div>
-                            <div class="col-md-3 mb-2">
-                                <label for="search_extracurricular_perpage">조회 건수</label>
-                                <select id="search_extracurricular_perpage" class="form-control">
-                                    <option value="20">20</option>
-                                    <option value="50" selected="selected">50</option>
-                                    <option value="100">100</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3 mb-2 d-flex align-items-end">
-                                <button class="btn btn-primary mr-2" onclick="reload_extracurricular_admin(); return false;">조회</button>
-                                <button class="btn btn-outline-secondary" onclick="reset_extracurricular_search(); return false;">초기화</button>
-                            </div>
+                <div class="mb-4">
+                    <input type="hidden" id="input_extracurricular_keyword_changed" value="0" />
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">삭제여부</label>
+                        <div class="col-sm-4">
+                            <select class="select_search_extracurricular_keyword form-control mb-2" name="deleted" id="search_extracurricular_deleted" onchange="listener_extracurricular_keyword_changed()">
+                                <option value="" selected="selected">전체</option>
+                                <option value="false">일반</option>
+                                <option value="true">삭제</option>
+                            </select>
+                        </div>
+                        <label class="col-sm-6 col-form-label"></label>
+
+                        <label class="col-sm-2 col-form-label">등록 시기</label>
+                        <div class="col-sm-3">
+                            <input class="form-control mb-2" id="search_extracurricular_sdate" type="date" onchange="listener_extracurricular_keyword_changed()"/>
+                        </div>
+                        <div class="col-sm-3">
+                            <input class="form-control mb-2" id="search_extracurricular_fdate" type="date" onchange="listener_extracurricular_keyword_changed()"/>
+                        </div>
+                        <div class="col-sm-4">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="set_search_sdatefdate('null', 'extracurricular', listener_extracurricular_keyword_changed); return false;">초기화</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="set_search_sdatefdate('today', 'extracurricular', listener_extracurricular_keyword_changed); return false;">오늘</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="set_search_sdatefdate('week', 'extracurricular', listener_extracurricular_keyword_changed); return false;">1주</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="set_search_sdatefdate('month', 'extracurricular', listener_extracurricular_keyword_changed); return false;">1개월</button>
+                        </div>
+
+                        <label class="col-sm-2 col-form-label">키워드</label>
+                        <div class="col-sm-2">
+                            <select class="form-control mb-2" id="search_extracurricular_keyword_field" onchange="set_extracurricular_keyword_field()">
+                                <option value="10" selected="selected">제목</option>
+                                <option value="20">요약</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-8">
+                            <input id="search_extracurricular_keyword_title" onchange="listener_extracurricular_keyword_changed();"
+                                   class="form-control search_extracurricular_keyword_each search_extracurricular_keyword_each_10 mb-2" type="text" placeholder="제목을 입력하세요"/>
+                            <input id="search_extracurricular_keyword_summary" onchange="listener_extracurricular_keyword_changed();"
+                                   class="form-control search_extracurricular_keyword_each search_extracurricular_keyword_each_20 mb-2 hide" type="text" placeholder="요약을 입력하세요"/>
+                        </div>
+
+                        <input type="hidden" id="cursor_extracurricular" />
+                        <label class="col-sm-2 col-form-label">검색 기준</label>
+                        <div class="col-sm-2">
+                            <select class="form-control" id="search_extracurricular_orderby" onchange="listener_extracurricular_keyword_changed();">
+                                <option value="id" selected="selected">등록순</option>
+                            </select>
+                        </div>
+                        <label class="col-sm-2 col-form-label">한번에 불러올 갯수</label>
+                        <div class="col-sm-2">
+                            <select id="search_extracurricular_perpage" class="form-control" onchange="listener_extracurricular_keyword_changed();">
+                                <option value="10">10</option>
+                                <option value="50" selected="selected">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <label class="col-sm-2 col-form-label">조회방향</label>
+                        <div class="col-sm-2">
+                            <select id="search_extracurricular_orderway" class="form-control" onchange="listener_extracurricular_keyword_changed();">
+                                <option value="DESC" selected="selected">역방향</option>
+                                <option value="ASC">정방향</option>
+                            </select>
+                        </div>
+
+                        <label class="col-sm-10 col-form-label"></label>
+                        <div class="col-sm-2 text-right">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="reset_extracurricular_search(); return false;">초기화</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="mb-2">
+                <div class="w-100 mb-2">
                     <button id="btn_extracurricular_create" class="btn btn-primary" onclick="open_create_extracurricular_modal(); return false;">대외활동 등록</button>
                     <span id="extracurricular_readonly_msg" class="text-muted ml-2" style="display:none;">읽기 권한만 있습니다. 수정/삭제는 불가합니다.</span>
+                    <span class="float-right">총 <span id="font_extracurricular_total_itemcount">-</span>개</span>
                 </div>
 
                 <div class="table-responsive">
@@ -54,9 +103,11 @@
                         <thead>
                         <tr>
                             <th style="width:70px;">ID</th>
+                            <th style="width:90px;">삭제여부</th>
                             <th>제목</th>
                             <th>요약</th>
                             <th style="width:130px;">상세 URL</th>
+                            <th style="width:220px;">입력일시/수정일시</th>
                             <th style="width:170px;">관리</th>
                         </tr>
                         </thead>
@@ -115,14 +166,20 @@
     let extracurricularAdminCanManage = false;
 
     $(document).ready(function(){
-        $("#search_extracurricular_keyword").on("keydown", function(e){
+        $("#search_extracurricular_keyword_title").on("keydown", function(e){
             if(e.key === "Enter"){
-                reload_extracurricular_admin();
+                listener_extracurricular_keyword_changed();
+            }
+        });
+        $("#search_extracurricular_keyword_summary").on("keydown", function(e){
+            if(e.key === "Enter"){
+                listener_extracurricular_keyword_changed();
             }
         });
         $("#edit_extracurricular_img").on("input", function(){
             sync_extracurricular_img_preview_from_input();
         });
+        set_extracurricular_keyword_field(false);
         resolve_extracurricular_manage_permission(function(){
             reload_extracurricular_admin();
         });
@@ -159,29 +216,63 @@
         $("#extracurricular_readonly_msg").show();
     }
 
+    function listener_extracurricular_keyword_changed(){
+        $("#input_extracurricular_keyword_changed").val("1");
+        reload_extracurricular_admin();
+    }
+
+    function set_extracurricular_keyword_field(shouldReload){
+        let field = $("#search_extracurricular_keyword_field").val() || "10";
+        $(".search_extracurricular_keyword_each").addClass("hide");
+        $(".search_extracurricular_keyword_each_" + field).removeClass("hide");
+        if(shouldReload !== false){
+            listener_extracurricular_keyword_changed();
+        }
+    }
+
     function reset_extracurricular_search(){
-        $("#search_extracurricular_keyword").val("");
+        $("#search_extracurricular_deleted").val("");
+        $("#search_extracurricular_sdate").val("");
+        $("#search_extracurricular_fdate").val("");
+        $("#search_extracurricular_keyword_field").val("10");
+        $("#search_extracurricular_keyword_title").val("");
+        $("#search_extracurricular_keyword_summary").val("");
+        $("#search_extracurricular_orderby").val("id");
+        $("#search_extracurricular_orderway").val("DESC");
         $("#search_extracurricular_perpage").val("50");
+        set_extracurricular_keyword_field(false);
         reload_extracurricular_admin();
     }
 
     function reload_extracurricular_admin(){
+        let keywordField = $("#search_extracurricular_keyword_field").val() || "10";
+        let keyword = "";
+        if(keywordField === "20"){
+            keyword = $("#search_extracurricular_keyword_summary").val();
+        } else {
+            keyword = $("#search_extracurricular_keyword_title").val();
+        }
+
         let _data = new Map();
         _data.url = "/api/extracurricular_activities/scrollList";
         _data.type = "GET";
         _data.param = {
             perpage: Number($("#search_extracurricular_perpage").val() || 50),
-            orderby: "id",
-            orderway: "DESC",
+            orderby: $("#search_extracurricular_orderby").val() || "id",
+            orderway: $("#search_extracurricular_orderway").val() || "DESC",
             cursor: null,
-            deleted: false,
-            keyword: $("#search_extracurricular_keyword").val()
+            sdate: $("#search_extracurricular_sdate").val(),
+            fdate: $("#search_extracurricular_fdate").val(),
+            deleted: listenerGetBooleanFromSelect("search_extracurricular_deleted"),
+            keyword: keyword
         };
         _data.success = function(list){
             extracurricularAdminRows = list || [];
             render_extracurricular_admin_rows();
         };
         _data.error = function(){
+            extracurricularAdminRows = [];
+            $("#font_extracurricular_total_itemcount").text("0");
             alert("대외활동 목록을 불러오지 못했습니다.");
         };
         func_ajax(_data);
@@ -190,20 +281,25 @@
     function render_extracurricular_admin_rows(){
         let tbody = $("#tbody_extracurricular_admin_list");
         tbody.html("");
+        $("#font_extracurricular_total_itemcount").text(extracurricularAdminRows.length);
 
         if(extracurricularAdminRows.length === 0){
-            tbody.append("<tr><td colspan='5' class='text-center text-muted'>등록된 대외활동이 없습니다.</td></tr>");
+            tbody.append("<tr><td colspan='7' class='text-center text-muted'>등록된 대외활동이 없습니다.</td></tr>");
             return;
         }
 
         for(let row of extracurricularAdminRows){
             let id = row.id == null ? "-" : row.id;
+            let deletedText = row.deleted === true ? "삭제" : "일반";
             let title = escape_html(row.title || "");
             let summary = escape_html(row.summary || "");
             let detailUrl = row.detailUrl || "";
             let detailMarkup = detailUrl
                 ? ("<a href='" + escape_attr(detailUrl) + "' target='_blank' rel='noopener noreferrer'>열기</a>")
                 : "-";
+            let createdAt = format_datetime_display(row.createdAt);
+            let modifiedAt = format_datetime_display(row.modifiedAt);
+            let dateInfo = createdAt + " / " + modifiedAt;
 
             let actionMarkup = "<span class='text-muted'>조회 전용</span>";
             if(extracurricularAdminCanManage && row.id != null){
@@ -215,13 +311,29 @@
             let tr = ""
                 + "<tr>"
                 + "<td>" + id + "</td>"
+                + "<td>" + deletedText + "</td>"
                 + "<td>" + title + "</td>"
                 + "<td>" + summary + "</td>"
                 + "<td>" + detailMarkup + "</td>"
+                + "<td>" + dateInfo + "</td>"
                 + "<td>" + actionMarkup + "</td>"
                 + "</tr>";
             tbody.append(tr);
         }
+    }
+
+    function format_datetime_display(value){
+        if(!value){
+            return "-";
+        }
+        let text = (value + "").trim();
+        if(!text){
+            return "-";
+        }
+        if(text.length > 19){
+            text = text.substring(0, 19);
+        }
+        return text.replace("T", " ");
     }
 
     function open_create_extracurricular_modal(){

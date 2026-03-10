@@ -106,7 +106,7 @@ public class SupportProjectRestController {
         return ResponseEntity.ok(supportProjectService.list(params, reqUserId));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/pagedList")
     public ResponseEntity<DefaultDto.PagedListResDto> pagedList(
             SupportProjectDto.PagedListReqDto params,
@@ -117,7 +117,7 @@ public class SupportProjectRestController {
         return ResponseEntity.ok(supportProjectService.pagedList(params, reqUserId));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/scrollList")
     public ResponseEntity<List<SupportProjectDto.DetailResDto>> scrollList(
             SupportProjectDto.ScrollListReqDto params,
