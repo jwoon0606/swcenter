@@ -24,6 +24,10 @@
 
     function load_admin_link_visibility(){
         $("#topbar_admin_link").hide();
+        request_admin_link_visibility(false);
+    }
+
+    function request_admin_link_visibility(retriedAfterRefresh){
         $.ajax({
             url: "/api/permissiondetail/allow",
             type: "POST",
@@ -42,8 +46,45 @@
                     $("#topbar_admin_link").hide();
                 }
             },
-            error: function(){
+            error: function(xhr){
+                if (!retriedAfterRefresh && xhr != null && xhr.status === 401) {
+                    refresh_access_token_for_admin_link(function(success){
+                        if (success) {
+                            request_admin_link_visibility(true);
+                        } else {
+                            $("#topbar_admin_link").hide();
+                        }
+                    });
+                    return;
+                }
                 $("#topbar_admin_link").hide();
+            }
+        });
+    }
+
+    function refresh_access_token_for_admin_link(callback){
+        let refreshToken = localStorage.getItem("refreshToken");
+        if (refreshToken == null || String(refreshToken).trim() === "") {
+            callback(false);
+            return;
+        }
+        $.ajax({
+            url: "/api/auth",
+            method: "POST",
+            beforeSend: function(xhr){
+                xhr.setRequestHeader("RefreshToken", refreshToken);
+            },
+            success: function(data, status, xhr){
+                let accessToken = xhr.getResponseHeader("Authorization");
+                if (accessToken == null || String(accessToken).trim() === "") {
+                    callback(false);
+                    return;
+                }
+                localStorage.setItem("accessToken", accessToken);
+                callback(true);
+            },
+            error: function(){
+                callback(false);
             }
         });
     }

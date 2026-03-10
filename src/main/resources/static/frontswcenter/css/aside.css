@@ -159,34 +159,34 @@
     bottom: 6px;
 }
 
-.board-list-page .board-filter-box select {
-    border: none;
-    background: transparent;
-    color: #4b4f57;
-    font-size: 16px;
-    line-height: 1;
-    padding: 0 24px 0 4px;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-}
-
 .board-list-page .board-filter-box {
-    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
 }
 
-.board-list-page .board-filter-box::after {
-    content: "";
-    position: absolute;
-    right: 6px;
-    top: 50%;
-    width: 8px;
-    height: 8px;
-    border-right: 1.5px solid #4b4f57;
-    border-bottom: 1.5px solid #4b4f57;
-    transform: translateY(-70%) rotate(45deg);
-    pointer-events: none;
+.board-list-page .board-subject-button {
+    border: 1px solid #c9d3e1;
+    background: #fff;
+    color: #4b4f57;
+    font-size: 14px;
+    line-height: 1;
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.board-list-page .board-subject-button:hover {
+    border-color: #09316b;
+    color: #09316b;
+}
+
+.board-list-page .board-subject-button.is-active {
+    background: #09316b;
+    border-color: #09316b;
+    color: #fff;
 }
 
 .board-list-page .board-table-box {
@@ -687,7 +687,8 @@
     }
 
     .board-list-page .board-filter-box {
-        align-self: flex-end;
+        align-self: stretch;
+        justify-content: flex-start;
     }
 
     .board-list-page .board-table-box {

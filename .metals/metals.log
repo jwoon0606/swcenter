@@ -477,3 +477,18 @@ WARNING: Unmatched cancel notification for request id 1
 2026.03.09 16:38:45 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/JwtAuthorizationFilter.java. Using fallback presentation compiler.
 2026.03.09 16:39:19 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/JwtAuthorizationFilter.java. Using fallback presentation compiler.
 2026.03.09 16:48:47 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/JwtAuthorizationFilter.java. Using fallback presentation compiler.
+2026.03.10 14:35:08 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/JwtAuthorizationFilter.java. Using fallback presentation compiler.
+2026.03.10 16:01:18 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/JwtAuthorizationFilter.java
+2026.03.10 16:01:18 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/JwtAuthorizationFilter.java. Using fallback presentation compiler.
+Mar 10, 2026 4:01:19 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 43
+2026.03.10 16:01:18 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/security/JwtAuthorizationFilter.java. Using fallback presentation compiler.
+2026.03.10 16:01:19 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/config/SecurityConfig.java
+2026.03.10 16:01:18 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/config/SecurityConfig.java. Using fallback presentation compiler.
+Mar 10, 2026 4:01:19 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 44
+2026.03.10 16:01:18 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.03.10 16:01:20 INFO  Shutting down server
+2026.03.10 16:01:20 INFO  Memory monitor stopped
+2026.03.10 16:01:20 INFO  shutting down Metals
+2026.03.10 16:01:20 INFO  Exiting server

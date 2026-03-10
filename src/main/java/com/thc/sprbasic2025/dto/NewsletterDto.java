@@ -5,6 +5,8 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+
 public class NewsletterDto {
     public static final String DEFAULT_DETAIL_URL = "https://walab.info/swplus/newsletter/2212_v14/newsletter_v14.html";
 
@@ -55,6 +57,26 @@ public class NewsletterDto {
     @Getter @Setter @SuperBuilder @NoArgsConstructor @AllArgsConstructor
     public static class ScrollListReqDto extends DefaultDto.ScrollListReqDto {
         String category;
+    }
+
+    @Getter @Setter @SuperBuilder @NoArgsConstructor @AllArgsConstructor
+    public static class SubscriberScrollListReqDto extends DefaultDto.ScrollListReqDto {
+        Boolean subscribed;
+    }
+
+    @Getter @Setter @SuperBuilder @NoArgsConstructor @AllArgsConstructor
+    public static class SubscriberDetailResDto extends DefaultDto.DetailResDto {
+        String name;
+        String email;
+        Boolean agreePrivacy;
+        LocalDateTime subscribedAt;
+        Boolean subscribed;
+    }
+
+    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class SubscriberUpdateReqDto {
+        Long id;
+        Boolean subscribed;
     }
 
     @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor

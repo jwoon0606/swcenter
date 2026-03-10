@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,6 +82,16 @@ public class ExtracurricularActivityServiceimpl implements ExtracurricularActivi
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get("deleted"), param.getDeleted()));
 
+            LocalDate sDate = parseDate(param.getSdate());
+            if (sDate != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), sDate.atStartOfDay()));
+            }
+
+            LocalDate fDate = parseDate(param.getFdate());
+            if (fDate != null) {
+                predicates.add(cb.lessThan(root.get("createdAt"), fDate.plusDays(1).atStartOfDay()));
+            }
+
             String keyword = safeTrim(param.getKeyword());
             if (!keyword.isEmpty()) {
                 String likeKeyword = "%" + keyword + "%";
@@ -132,5 +143,17 @@ public class ExtracurricularActivityServiceimpl implements ExtracurricularActivi
 
     private String safeTrim(String value) {
         return value == null ? "" : value.trim();
+    }
+
+    private LocalDate parseDate(String value) {
+        String text = safeTrim(value);
+        if (text.isEmpty()) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(text);
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 }

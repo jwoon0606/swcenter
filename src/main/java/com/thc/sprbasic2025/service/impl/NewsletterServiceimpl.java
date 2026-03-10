@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -102,6 +103,16 @@ public class NewsletterServiceimpl implements NewsletterService {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get("deleted"), param.getDeleted()));
 
+            LocalDate sDate = parseDate(param.getSdate());
+            if (sDate != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), sDate.atStartOfDay()));
+            }
+
+            LocalDate fDate = parseDate(param.getFdate());
+            if (fDate != null) {
+                predicates.add(cb.lessThan(root.get("createdAt"), fDate.plusDays(1).atStartOfDay()));
+            }
+
             String keyword = safeTrim(param.getKeyword());
             if (!keyword.isEmpty()) {
                 String likeKeyword = "%" + keyword + "%";
@@ -136,6 +147,74 @@ public class NewsletterServiceimpl implements NewsletterService {
             result.add(toDetail(row, canUpdate));
         }
         return result;
+    }
+
+    @Override
+    public List<NewsletterDto.SubscriberDetailResDto> subscriberScrollList(NewsletterDto.SubscriberScrollListReqDto param, Long reqUserId) {
+        permittedService.isPermitted(reqUserId, target, 120);
+        param.init();
+
+        Sort.Direction direction = "ASC".equalsIgnoreCase(param.getOrderway())
+                ? Sort.Direction.ASC
+                : Sort.Direction.DESC;
+
+        PageRequest pageable = PageRequest.of(0, param.getPerpage(), Sort.by(direction, "id"));
+        Specification<NewsletterSubscriber> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            String keyword = safeTrim(param.getKeyword());
+            if (!keyword.isEmpty()) {
+                String likeKeyword = "%" + keyword + "%";
+                predicates.add(cb.or(
+                        cb.like(root.get("name"), likeKeyword),
+                        cb.like(cb.lower(root.get("email")), "%" + keyword.toLowerCase(Locale.ROOT) + "%")
+                ));
+            }
+
+            if (param.getSubscribed() != null) {
+                predicates.add(cb.equal(root.get("deleted"), !param.getSubscribed()));
+            }
+
+            if (param.getCursor() != null) {
+                if (direction == Sort.Direction.DESC) {
+                    predicates.add(cb.lessThan(root.get("id"), param.getCursor()));
+                } else {
+                    predicates.add(cb.greaterThan(root.get("id"), param.getCursor()));
+                }
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        List<NewsletterSubscriber> rows = newsletterSubscriberRepository.findAll(spec, pageable).getContent();
+        List<NewsletterDto.SubscriberDetailResDto> result = new ArrayList<>();
+        for (NewsletterSubscriber row : rows) {
+            result.add(toSubscriberDetail(row));
+        }
+        return result;
+    }
+
+    @Override
+    public void updateSubscriber(NewsletterDto.SubscriberUpdateReqDto param, Long reqUserId) {
+        permittedService.isPermitted(reqUserId, target, 120);
+        if (param == null || param.getId() == null) {
+            throw new RuntimeException("id required");
+        }
+        NewsletterSubscriber subscriber = newsletterSubscriberRepository.findById(param.getId())
+                .orElseThrow(() -> new NoMatchingDataException("no data"));
+
+        if (param.getSubscribed() != null) {
+            if (param.getSubscribed()) {
+                String name = safeTrim(subscriber.getName());
+                if (name.isEmpty()) {
+                    name = "구독자";
+                }
+                subscriber.resubscribe(name);
+            } else {
+                subscriber.unsubscribe();
+            }
+            newsletterSubscriberRepository.save(subscriber);
+        }
     }
 
     @Override
@@ -263,6 +342,20 @@ public class NewsletterServiceimpl implements NewsletterService {
                 .build();
     }
 
+    private NewsletterDto.SubscriberDetailResDto toSubscriberDetail(NewsletterSubscriber row) {
+        return NewsletterDto.SubscriberDetailResDto.builder()
+                .id(row.getId())
+                .deleted(row.getDeleted())
+                .createdAt(row.getCreatedAt())
+                .modifiedAt(row.getModifiedAt())
+                .name(row.getName())
+                .email(row.getEmail())
+                .agreePrivacy(row.getAgreePrivacy())
+                .subscribedAt(row.getSubscribedAt())
+                .subscribed(!Boolean.TRUE.equals(row.getDeleted()))
+                .build();
+    }
+
     private String safeDetailUrl(String detailUrl) {
         String value = safeTrim(detailUrl);
         if (value.isEmpty()) {
@@ -273,6 +366,18 @@ public class NewsletterServiceimpl implements NewsletterService {
 
     private String safeTrim(String value) {
         return value == null ? "" : value.trim();
+    }
+
+    private LocalDate parseDate(String value) {
+        String text = safeTrim(value);
+        if (text.isEmpty()) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(text);
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
     private boolean canManageNewsletter(Long reqUserId) {

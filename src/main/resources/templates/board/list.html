@@ -16,18 +16,16 @@
                 <input type="text" id="board_keyword" placeholder="제목 검색" aria-label="게시글 제목 검색" />
                 <button type="button" id="board_search_button" aria-label="검색" onclick="submit_board_search(); return false;"></button>
             </div>
-            <div class="board-filter-box">
-                <select id="board_subject_filter" aria-label="주제 필터">
-                    <option value="">All</option>
-                    <option value="일상">일상</option>
-                    <option value="자유">자유</option>
-                    <option value="고민">고민</option>
-                    <option value="시사">시사</option>
-                    <option value="기술트랜드">기술트랜드</option>
-                    <option value="작가">작가</option>
-                    <option value="영화 후기">영화 후기</option>
-                    <option value="수필">수필</option>
-                </select>
+            <div class="board-filter-box" id="board_subject_filter" role="group" aria-label="주제 필터">
+                <button type="button" class="board-subject-button is-active" data-subject="" aria-pressed="true">All</button>
+                <button type="button" class="board-subject-button" data-subject="자유" aria-pressed="false">자유</button>
+                <button type="button" class="board-subject-button" data-subject="일상" aria-pressed="false">일상</button>
+                <button type="button" class="board-subject-button" data-subject="고민" aria-pressed="false">고민</button>
+                <button type="button" class="board-subject-button" data-subject="시사" aria-pressed="false">시사</button>
+                <button type="button" class="board-subject-button" data-subject="기술트랜드" aria-pressed="false">기술트랜드</button>
+                <button type="button" class="board-subject-button" data-subject="작가" aria-pressed="false">작가</button>
+                <button type="button" class="board-subject-button" data-subject="영화 후기" aria-pressed="false">영화 후기</button>
+                <button type="button" class="board-subject-button" data-subject="수필" aria-pressed="false">수필</button>
             </div>
         </div>
 
@@ -90,8 +88,12 @@
             }
         });
 
-        $("#board_subject_filter").on("change", function () {
-            boardState.subject = ($(this).val() || "").trim();
+        $("#board_subject_filter").on("click", ".board-subject-button", function () {
+            const nextSubject = normalize_board_subject($(this).attr("data-subject"));
+            if (nextSubject === boardState.subject) {
+                return;
+            }
+            set_board_subject_filter(nextSubject);
             load_board_page(1);
         });
 
@@ -102,11 +104,12 @@
             }
             load_board_page(nextPage);
         });
+
+        set_board_subject_filter(boardState.subject);
     }
 
     function submit_board_search() {
         boardState.keyword = ($("#board_keyword").val() || "").trim();
-        boardState.subject = ($("#board_subject_filter").val() || "").trim();
         load_board_page(1);
     }
 
@@ -145,7 +148,7 @@
                     boardState.callpage = boardState.totalpage;
                 }
 
-                sync_subject_options(list);
+                sync_subject_buttons(list);
                 render_board_rows(list);
                 render_board_pagination();
             },
@@ -233,24 +236,52 @@
         $target.append($button);
     }
 
-    function sync_subject_options(list) {
-        const $select = $("#board_subject_filter");
-        const selectedValue = ($select.val() || "").trim();
+    function sync_subject_buttons(list) {
+        const $filterBox = $("#board_subject_filter");
         const exists = {};
 
-        $select.find("option").each(function () {
-            exists[$(this).val()] = true;
+        $filterBox.find(".board-subject-button").each(function () {
+            const subject = normalize_board_subject($(this).attr("data-subject"));
+            exists[subject] = true;
         });
 
         for (const item of list) {
             const subject = get_board_subject(item);
             if (subject !== "" && !exists[subject]) {
                 exists[subject] = true;
-                $select.append($(document.createElement("option")).val(subject).text(subject));
+                $filterBox.append(create_subject_button(subject));
             }
         }
 
-        $select.val(selectedValue);
+        set_board_subject_filter(boardState.subject);
+    }
+
+    function create_subject_button(subject) {
+        return $(document.createElement("button"))
+            .attr("type", "button")
+            .addClass("board-subject-button")
+            .attr("data-subject", subject)
+            .attr("aria-pressed", "false")
+            .text(subject);
+    }
+
+    function set_board_subject_filter(subject) {
+        const selected = normalize_board_subject(subject);
+        boardState.subject = selected;
+
+        $("#board_subject_filter .board-subject-button").each(function () {
+            const buttonSubject = normalize_board_subject($(this).attr("data-subject"));
+            const isActive = buttonSubject === selected;
+            $(this).toggleClass("is-active", isActive);
+            $(this).attr("aria-pressed", isActive ? "true" : "false");
+        });
+    }
+
+    function normalize_board_subject(value) {
+        if (value == null) {
+            return "";
+        }
+        return String(value).trim();
     }
 
     function parse_subject_and_title(rawTitle) {
