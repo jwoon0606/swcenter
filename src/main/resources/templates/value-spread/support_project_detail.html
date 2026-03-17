@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <th:block th:replace="~{includes/user/head}" />
-<link rel="stylesheet" href="/frontswcenter/css/aside.css">
-<link rel="stylesheet" href="/frontswcenter/css/introduction.css">
+<link rel="stylesheet" href="https://news.aiswcenter.org/publish/css/aside.css">
+<link rel="stylesheet" href="https://news.aiswcenter.org/publish/css/introduction.css">
 <style>
     .support-detail-wrap {
         border: 1px solid #e3eaf3;
@@ -95,7 +95,7 @@
         <section id="support_project_detail_box" class="support-detail-wrap" style="display:none;">
             <div id="support_project_detail_date" class="support-detail-date">-</div>
             <h1 id="support_project_detail_title" class="support-detail-title">-</h1>
-            <img id="support_project_detail_img" class="support-detail-thumb" src="/frontswcenter/img/value-spread/sw_val_candidate1.png" alt="지원 프로젝트 이미지" />
+            <img id="support_project_detail_img" class="support-detail-thumb" src="https://news.aiswcenter.org/publish/img/value-spread/sw_val_candidate1.png" alt="지원 프로젝트 이미지" />
             <div id="support_project_detail_content" class="support-detail-content"></div>
             <div class="support-detail-actions">
                 <a id="support_project_detail_link" class="support-detail-btn" href="#" target="_blank" rel="noopener" style="display:none;">프로젝트 바로가기</a>
@@ -113,7 +113,7 @@
 <th:block th:replace="~{includes/user/bottom}" />
 
 <script>
-    const SUPPORT_PROJECT_DETAIL_FALLBACK_IMG = "/frontswcenter/img/value-spread/sw_val_candidate1.png";
+    const SUPPORT_PROJECT_DETAIL_FALLBACK_IMG = "https://news.aiswcenter.org/publish/img/value-spread/sw_val_candidate1.png";
 
     function supportProjectDetailIdFromPath() {
         const chunks = window.location.pathname.split("/").filter(Boolean);

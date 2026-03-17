@@ -10,7 +10,7 @@ body {
   padding: 40px 0 70px;
   position: relative;
   overflow: hidden;
-  background-image: url("/frontswcenter/img/login/login-hero-bg.png");
+  background-image: url("https://news.aiswcenter.org/publish/img/login/login-hero-bg.png");
   background-size: cover;
   background-position: center right;
   background-repeat: no-repeat;
