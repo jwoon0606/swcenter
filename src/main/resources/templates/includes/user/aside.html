@@ -1,25 +1,51 @@
+<style>
+    @media (max-width: 768px) {
+        .aside-nav ul {
+            display: grid;
+            grid-template-columns: repeat(2, max-content);
+            row-gap: 10px;
+            column-gap: 32px;
+            justify-content: center;
+        }
+
+        .aside-nav.is-board ul {
+            grid-template-columns: max-content;
+        }
+
+        .aside-nav li {
+            min-width: 132px;
+        }
+
+        .aside-nav a {
+            box-sizing: border-box;
+            white-space: nowrap;
+        }
+    }
+</style>
 <aside class="aside-nav">
     <ul>
-        <li><a href="/introduction/mission" class="a_aside_nav a_aside_nav_introduction a_aside_nav_introduction_1">사업단 목표</a></li>
-        <li><a href="/introduction/organization" class="a_aside_nav a_aside_nav_introduction a_aside_nav_introduction_2">조직도</a></li>
-        <li><a href="/introduction/business_support" class="a_aside_nav a_aside_nav_introduction a_aside_nav_introduction_3">기업 지원 센터</a></li>
-        <li><a href="/introduction/location" class="a_aside_nav a_aside_nav_introduction a_aside_nav_introduction_4">오시는길</a></li>
+        <li class="aside-nav__item aside-nav__item_introduction"><a href="/introduction/mission" class="a_aside_nav a_aside_nav_introduction a_aside_nav_introduction_1">사업단 목표</a></li>
+        <li class="aside-nav__item aside-nav__item_introduction"><a href="/introduction/organization" class="a_aside_nav a_aside_nav_introduction a_aside_nav_introduction_2">조직도</a></li>
+        <li class="aside-nav__item aside-nav__item_introduction"><a href="/introduction/business_support" class="a_aside_nav a_aside_nav_introduction a_aside_nav_introduction_3">기업 지원 센터</a></li>
+        <li class="aside-nav__item aside-nav__item_introduction"><a href="/introduction/location" class="a_aside_nav a_aside_nav_introduction a_aside_nav_introduction_4">오시는길</a></li>
 
-        <li><a href="/value-spread/support_project" class="a_aside_nav a_aside_nav_value-spread a_aside_nav_value-spread_1">지원 프로젝트</a></li>
-        <li><a href="/value-spread/operation_status" class="a_aside_nav a_aside_nav_value-spread a_aside_nav_value-spread_2">운영 현황</a></li>
-        <li><a href="/value-spread/sw_education" class="a_aside_nav a_aside_nav_value-spread a_aside_nav_value-spread_3">SW교육</a></li>
+        <li class="aside-nav__item aside-nav__item_value-spread"><a href="/value-spread/support_project" class="a_aside_nav a_aside_nav_value-spread a_aside_nav_value-spread_1">지원 프로젝트</a></li>
+        <li class="aside-nav__item aside-nav__item_value-spread"><a href="/value-spread/operation_status" class="a_aside_nav a_aside_nav_value-spread a_aside_nav_value-spread_2">운영 현황</a></li>
+        <li class="aside-nav__item aside-nav__item_value-spread"><a href="/value-spread/sw_education" class="a_aside_nav a_aside_nav_value-spread a_aside_nav_value-spread_3">SW교육</a></li>
 
-        <li><a href="/notice/list" class="a_aside_nav a_aside_nav_news a_aside_nav_news_1">공지사항</a></li>
-        <li><a href="/news/news_letter" class="a_aside_nav a_aside_nav_news a_aside_nav_news_2">뉴스레터</a></li>
-        <li><a href="/news/extracurricular_activities" class="a_aside_nav a_aside_nav_news a_aside_nav_news_3">대외활동</a></li>
+        <li class="aside-nav__item aside-nav__item_news"><a href="/notice/list" class="a_aside_nav a_aside_nav_news a_aside_nav_news_1">공지사항</a></li>
+        <li class="aside-nav__item aside-nav__item_news"><a href="/news/news_letter" class="a_aside_nav a_aside_nav_news a_aside_nav_news_2">뉴스레터</a></li>
+        <li class="aside-nav__item aside-nav__item_news"><a href="/news/extracurricular_activities" class="a_aside_nav a_aside_nav_news a_aside_nav_news_3">대외활동</a></li>
 
-        <li><a href="/board/list" class="a_aside_nav a_aside_nav_board a_aside_nav_board_1">일반 게시판</a></li>
+        <li class="aside-nav__item aside-nav__item_board"><a href="/board/list" class="a_aside_nav a_aside_nav_board a_aside_nav_board_1">일반 게시판</a></li>
     </ul>
 </aside>
 <script>
     function listener_aside_nav_active(obj_cate, obj_page){
-        $(".a_aside_nav").css("display", "none");
-        $(".a_aside_nav_"+obj_cate).css("display", "");
+        $(".aside-nav").removeClass("is-introduction is-value-spread is-news is-board").addClass("is-" + obj_cate);
+        $(".aside-nav__item").css("display", "none");
+        $(".aside-nav__item_"+obj_cate).css("display", "");
+        $(".a_aside_nav").removeClass("active");
         $(".a_aside_nav_"+obj_cate+"_"+obj_page).addClass("active");
     }
 </script>

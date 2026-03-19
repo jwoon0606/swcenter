@@ -492,3 +492,92 @@ WARNING: Unmatched cancel notification for request id 44
 2026.03.10 16:01:20 INFO  Memory monitor stopped
 2026.03.10 16:01:20 INFO  shutting down Metals
 2026.03.10 16:01:20 INFO  Exiting server
+2026.03.19 20:45:22 INFO  Started: Metals version 1.6.6 in folders '/Users/sw/Documents/workspace/swcenter' for client Visual Studio Code 1.111.0.
+2026.03.19 20:45:22 INFO  Memory monitor started
+2026.03.19 20:45:25 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.03.19 20:45:26 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+Mar 19, 2026 8:45:27 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 2
+2026.03.19 20:45:26 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.03.19 20:45:27 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.03.19 20:45:27 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.03.19 20:45:27 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+Mar 19, 2026 8:45:27 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 8
+Mar 19, 2026 8:45:27 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 9
+2026.03.19 20:45:28 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.03.19 20:45:31 INFO  running '/Users/sw/Documents/workspace/swcenter/gradlew --stacktrace --console=plain --init-script /var/folders/cl/__9tzszj26g0n4m7c3hfbhy80000gn/T/metals18320103000173403650/init-script.gradle bloopInstall'
+2026.03.19 20:45:31 ERROR Running process '/Users/sw/Documents/workspace/swcenter/gradlew --stacktrace --console=plain --init-script /var/folders/cl/__9tzszj26g0n4m7c3hfbhy80000gn/T/metals18320103000173403650/init-script.gradle bloopInstall' failed
+java.io.IOException: Cannot run program "/Users/sw/Documents/workspace/swcenter/gradlew" (in directory "/Users/sw/Documents/workspace/swcenter"): error=13, Permission denied
+	at java.lang.ProcessBuilder.start(ProcessBuilder.java:1143)
+	at java.lang.ProcessBuilder.start(ProcessBuilder.java:1073)
+	at scala.meta.internal.process.SystemProcess$.run(SystemProcess.scala:48)
+	at scala.meta.internal.builds.ShellRunner.run(ShellRunner.scala:102)
+	at scala.meta.internal.builds.BloopInstall.runArgumentsUnconditionally(BloopInstall.scala:74)
+	at scala.meta.internal.builds.BloopInstall.$anonfun$run$1(BloopInstall.scala:49)
+	at scala.meta.internal.builds.BloopInstallProvider.bloopInstall(BloopInstallProvider.scala:22)
+	at scala.meta.internal.builds.BloopInstallProvider.bloopInstall$(BloopInstallProvider.scala:17)
+	at scala.meta.internal.builds.GradleBuildTool.bloopInstall(GradleBuildTool.scala:20)
+	at scala.meta.internal.builds.BloopInstall.run(BloopInstall.scala:46)
+	at scala.meta.internal.metals.ConnectionProvider$Connect$.bloopInstallAndConnect(ConnectionProvider.scala:696)
+	at scala.meta.internal.metals.ConnectionProvider$Connect$.$anonfun$pollAndConnect$1(ConnectionProvider.scala:396)
+	at scala.meta.internal.metals.ConnectionProvider$Connect$.$anonfun$pollAndConnect$1$adapted(ConnectionProvider.scala:374)
+	at scala.Option.foreach(Option.scala:437)
+	at scala.meta.internal.metals.ConnectionProvider$Connect$.pollAndConnect(ConnectionProvider.scala:374)
+	at scala.meta.internal.metals.ConnectionProvider$Connect$.connect(ConnectionProvider.scala:332)
+	at scala.meta.internal.metals.ConnectionProvider.runInstall$1(ConnectionProvider.scala:165)
+	at scala.meta.internal.metals.ConnectionProvider.$anonfun$slowConnectToBuildServer$2(ConnectionProvider.scala:168)
+	at scala.meta.internal.builds.BloopInstall.$anonfun$runIfApproved$3(BloopInstall.scala:153)
+	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:503)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(Thread.java:840)
+Caused by: java.io.IOException: error=13, Permission denied
+	at java.lang.ProcessImpl.forkAndExec(Native Method)
+	at java.lang.ProcessImpl.<init>(ProcessImpl.java:314)
+	at java.lang.ProcessImpl.start(ProcessImpl.java:244)
+	at java.lang.ProcessBuilder.start(ProcessBuilder.java:1110)
+	at java.lang.ProcessBuilder.start(ProcessBuilder.java:1073)
+	at scala.meta.internal.process.SystemProcess$.run(SystemProcess.scala:48)
+	at scala.meta.internal.builds.ShellRunner.run(ShellRunner.scala:102)
+	at scala.meta.internal.builds.BloopInstall.runArgumentsUnconditionally(BloopInstall.scala:74)
+	at scala.meta.internal.builds.BloopInstall.$anonfun$run$1(BloopInstall.scala:49)
+	at scala.meta.internal.builds.BloopInstallProvider.bloopInstall(BloopInstallProvider.scala:22)
+	at scala.meta.internal.builds.BloopInstallProvider.bloopInstall$(BloopInstallProvider.scala:17)
+	at scala.meta.internal.builds.GradleBuildTool.bloopInstall(GradleBuildTool.scala:20)
+	at scala.meta.internal.builds.BloopInstall.run(BloopInstall.scala:46)
+	at scala.meta.internal.metals.ConnectionProvider$Connect$.bloopInstallAndConnect(ConnectionProvider.scala:696)
+	at scala.meta.internal.metals.ConnectionProvider$Connect$.$anonfun$pollAndConnect$1(ConnectionProvider.scala:396)
+	at scala.meta.internal.metals.ConnectionProvider$Connect$.$anonfun$pollAndConnect$1$adapted(ConnectionProvider.scala:374)
+	at scala.Option.foreach(Option.scala:437)
+	at scala.meta.internal.metals.ConnectionProvider$Connect$.pollAndConnect(ConnectionProvider.scala:374)
+	at scala.meta.internal.metals.ConnectionProvider$Connect$.connect(ConnectionProvider.scala:332)
+	at scala.meta.internal.metals.ConnectionProvider.runInstall$1(ConnectionProvider.scala:165)
+	at scala.meta.internal.metals.ConnectionProvider.$anonfun$slowConnectToBuildServer$2(ConnectionProvider.scala:168)
+	at scala.meta.internal.builds.BloopInstall.$anonfun$runIfApproved$3(BloopInstall.scala:153)
+	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:503)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.lang.Thread.run(Thread.java:840)
+
+2026.03.19 20:45:31 INFO  time: ran 'gradle bloopInstall' in 69ms
+2026.03.19 20:45:31 ERROR Gradle command failed: /Users/sw/Documents/workspace/swcenter/gradlew --stacktrace --console=plain --init-script /var/folders/cl/__9tzszj26g0n4m7c3hfbhy80000gn/T/metals18320103000173403650/init-script.gradle bloopInstall
+2026.03.19 20:45:31 WARN  no build target for: /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java
+2026.03.19 20:45:54 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.03.19 20:45:54 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.03.19 20:46:01 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.03.19 20:47:01 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.03.19 20:47:01 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+Mar 19, 2026 8:47:07 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+2026.03.19 20:47:07 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.03.19 20:47:07 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+Mar 19, 2026 8:47:10 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+2026.03.19 20:47:12 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.03.19 21:02:17 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.03.19 21:04:19 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+2026.03.19 21:18:01 INFO  no build target found for /Users/sw/Documents/workspace/swcenter/src/main/java/com/thc/sprbasic2025/SprApplication.java. Using fallback presentation compiler.
+Mar 19, 2026 9:18:01 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 56

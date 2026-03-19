@@ -11,6 +11,21 @@
 
     <link rel="stylesheet" href="https://news.aiswcenter.org/publish/css/header.css">
     <link rel="stylesheet" href="https://news.aiswcenter.org/publish/css/footer.css">
+    <style>
+        @media (max-width: 768px) {
+            .header__nav:hover .mega-dropdown,
+            .main-menu li:hover .mega-dropdown,
+            .main-menu li.open .mega-dropdown {
+                display: none;
+            }
+
+            .mega-dropdown {
+                visibility: hidden;
+                padding: 0;
+                display: none;
+            }
+        }
+    </style>
 
     <script src="https://news.aiswcenter.org/publish/js/carousel.js" defer></script>
 
@@ -57,6 +72,5 @@
         }
     }
 </script>
-
 
 

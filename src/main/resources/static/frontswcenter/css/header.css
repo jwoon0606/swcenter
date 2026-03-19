@@ -313,15 +313,16 @@ body {
   .mega-dropdown {
     position: static;
     transform: none;
-    visibility: visible;
-    padding: 0 0 10px 20px;
+    visibility: hidden;
+    padding: 0;
     box-shadow: none;
     display: none;
   }
 
+  .header__nav:hover .mega-dropdown,
   .main-menu li:hover .mega-dropdown,
   .main-menu li.open .mega-dropdown {
-    display: flex;
+    display: none;
   }
 
   .menu-column {

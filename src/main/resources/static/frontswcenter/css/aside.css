@@ -623,14 +623,19 @@
     }
 
     .aside-nav ul {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+        display: grid;
+        grid-template-columns: repeat(2, max-content);
+        row-gap: 10px;
+        column-gap: 32px;
+        justify-content: center;
+    }
+
+    .aside-nav.is-board ul {
+        grid-template-columns: max-content;
     }
 
     .aside-nav li {
-        flex: 1;
-        min-width: fit-content;
+        min-width: 132px;
     }
 
     .aside-nav a {
@@ -639,6 +644,8 @@
         text-align: center;
         border: 1px solid #e0e6ef;
         border-radius: 4px;
+        box-sizing: border-box;
+        white-space: nowrap;
     }
 
     .content-area {
