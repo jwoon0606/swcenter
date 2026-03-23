@@ -439,6 +439,11 @@
     line-height: 1.6;
     color: #2c3e57;
 }
+.detail-page .detail-body {
+    word-break: break-all;       /* 긴 문자열 강제 줄바꿈 */
+    overflow-wrap: break-word;   /* 최신 표준 */
+    word-wrap: break-word;       /* 구형 브라우저 대응 */
+}
 
 .action-row {
     display: flex;
@@ -698,12 +703,82 @@
         justify-content: flex-start;
     }
 
+    /* Mobile card-style board list */
     .board-list-page .board-table-box {
         overflow-x: auto;
     }
 
     .board-list-page .board-table {
-        min-width: 640px;
+        min-width: 0 !important;
+        width: 100% !important;
+        table-layout: auto !important;
+    }
+
+    .board-list-page .board-table thead {
+        display: none !important;
+    }
+
+    .board-list-page .board-table tr {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px;
+        border-bottom: 1px solid #e5eaf2;
+        padding: 14px 0;
+        margin-bottom: 6px;
+    }
+
+    .board-list-page .board-table td {
+        display: none;
+        padding: 0;
+        border: none;
+        width: auto;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+
+    /* Category tag and date on first line */
+    .board-list-page .board-table td:nth-child(1),
+    .board-list-page .board-table td:nth-child(4) {
+        display: inline-block !important;
+        width: auto !important;
+        margin-bottom: 0;
+        padding: 0;
+        vertical-align: middle;
+    }
+
+    .board-list-page .board-table td:nth-child(1) {
+        font-weight: 600 !important;
+        color: #666 !important;
+        margin-right: 12px;
+        order: 1;
+    }
+
+    .board-list-page .board-table td:nth-child(4) {
+        color: #999 !important;
+        order: 2;
+        margin-left: auto;
+    }
+
+    /* Title on separate line */
+    .board-list-page .board-table td:nth-child(2) {
+        display: block !important;
+        width: 100% !important;
+        order: 3;
+        font-size: 16px;
+        font-weight: 600;
+        color: #1a1d24;
+        margin-top: 6px;
+        padding: 0;
+    }
+
+    /* Hide writer column on mobile */
+    .board-list-page .board-table td:nth-child(3) {
+        display: none !important;
+    }
+
+    .board-list-page .board-table-box {
+        overflow-x: hidden;
     }
 
     .board-list-page .board-list-footer {
@@ -759,5 +834,10 @@
 
     .detail-footer .secondary-button {
         width: 100%;
+    }
+
+    .detail-page .detail-body {
+        word-break: break-all;
+        overflow-wrap: break-word;
     }
 }
