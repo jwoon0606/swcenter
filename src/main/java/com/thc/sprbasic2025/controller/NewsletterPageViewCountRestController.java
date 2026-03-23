@@ -1,7 +1,10 @@
 package com.thc.sprbasic2025.controller;
 
 import com.thc.sprbasic2025.service.NewsletterPageViewCountService;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +20,7 @@ public class NewsletterPageViewCountRestController {
     }
 
     // 조회수 증가 + 반환
-    @PostMapping("/increase")
+    @GetMapping("/increase")
     public Map<String, Object> increaseView(
             @RequestParam String targetType,
             @RequestParam String targetKey
@@ -32,7 +35,7 @@ public class NewsletterPageViewCountRestController {
         return result;
     }
 
-    // 조회만 (선택)
+    // 조회만
     @GetMapping
     public Map<String, Object> getView(
             @RequestParam String targetType,
