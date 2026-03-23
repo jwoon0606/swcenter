@@ -61,6 +61,86 @@
     let editingCommentText = "";
     const boardLikeStoragePrefix = "board_like_";
 
+    function append_board_plain_text(target, text) {
+        let safeText = text == null ? "" : String(text);
+        let lines = safeText.split(/\r\n|\r|\n/);
+        for (let i = 0; i < lines.length; i++) {
+            if (i > 0) {
+                target.appendChild(document.createElement("br"));
+            }
+            if (lines[i] !== "") {
+                target.appendChild(document.createTextNode(lines[i]));
+            }
+        }
+    }
+
+    function sanitize_board_href(rawHref) {
+        let href = rawHref == null ? "" : String(rawHref).trim();
+        if (!href) {
+            return "";
+        }
+        if (/^(https?:|mailto:|tel:)/i.test(href)) {
+            return href;
+        }
+        if (href.startsWith("/")) {
+            return href;
+        }
+        return "";
+    }
+
+    function append_board_anchor(target, anchorHtml) {
+        let parser = new DOMParser();
+        let doc = parser.parseFromString(anchorHtml, "text/html");
+        let sourceAnchor = doc.body.querySelector("a");
+        if (sourceAnchor == null) {
+            append_board_plain_text(target, anchorHtml);
+            return;
+        }
+
+        let href = sanitize_board_href(sourceAnchor.getAttribute("href") || sourceAnchor.getAttribute("hred"));
+        let anchorText = (sourceAnchor.textContent || "").trim();
+        if (!href) {
+            append_board_plain_text(target, anchorText || anchorHtml);
+            return;
+        }
+
+        let renderedAnchor = document.createElement("a");
+        renderedAnchor.href = href;
+        renderedAnchor.textContent = anchorText || href;
+        if (/^https?:/i.test(href)) {
+            renderedAnchor.target = "_blank";
+            renderedAnchor.rel = "noopener noreferrer";
+        }
+        target.appendChild(renderedAnchor);
+    }
+
+    function render_board_content(rawContent) {
+        let target = document.querySelector(".font_board_content");
+        if (target == null) {
+            return;
+        }
+
+        let content = rawContent == null ? "" : String(rawContent);
+        if (content.trim() === "") {
+            target.textContent = "-";
+            return;
+        }
+
+        target.innerHTML = "";
+        let normalized = content.replace(/<a(\s+[^>]*?)\bhred(\s*=)/gi, "<a$1 href$2");
+        let anchorRegex = /<a\b[\s\S]*?<\/a>/gi;
+        let lastIndex = 0;
+        let match;
+
+        while ((match = anchorRegex.exec(normalized)) !== null) {
+            append_board_plain_text(target, normalized.substring(lastIndex, match.index));
+            append_board_anchor(target, match[0]);
+            lastIndex = match.index + match[0].length;
+        }
+
+        append_board_plain_text(target, normalized.substring(lastIndex));
+    }
+
     function render_board_extras(data) {
         let viewCount = parseInt(data.viewCount, 10);
         let likeCount = parseInt(data.likeCount, 10);
@@ -137,7 +217,7 @@
                 } else {
                     $("<div class=\"comment-text\" data-comment-id=\"" + item.id + "\"></div>").text(item.content || "").appendTo($item);
                 }
-                let metaText = ((item.userNick || item.userEmail || "익명") + " · " + (item.createdAt || ""));
+                let metaText = ((item.userNick || item.userEmail || "익명") + " · " + format_display_datetime(item.createdAt));
                 $("<div class=\"comment-meta\"></div>").text(metaText).appendTo($item);
                 if (item.editable === true || item.deletable === true) {
                     let $actions = $("<div class=\"comment-actions\" style=\"margin-top:8px;\"></div>");
@@ -308,6 +388,8 @@
         _data.success = function (obj_data) {
             currentBoardData = obj_data || {};
             listenerAfterDetail(obj_data, "board");
+            $(".font_board_createdAt").text(format_display_datetime(currentBoardData.createdAt));
+            render_board_content(currentBoardData.content);
             render_board_extras(currentBoardData);
             render_board_comments(boardId);
         };

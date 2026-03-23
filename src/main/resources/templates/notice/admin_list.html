@@ -12,7 +12,7 @@
         <td><font class="font_notice_order"></font></td>
         <td><font class="font_notice_deleted_{{deleted}} chk_notice_deleted_{{id}}">{{deleted}}</font></td>
         <td class="cursor_pointer" onclick="location.href='/notice/admin_detail/{{id}}';">{{title}}</td>
-        <td>{{createdAt}} / {{modifiedAt}}
+        <td>{{formatDateTime createdAt}} / {{formatDateTime modifiedAt}}
             <div class="hide">
                 <input class="input_cursor_notice_id" value="{{id}}"/>
             </div>

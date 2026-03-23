@@ -14,7 +14,7 @@
         <td class="cursor_pointer" onclick="location.href='/user/admin_detail/{{id}}';">{{username}}</td>
         <td class="cursor_pointer" onclick="location.href='/user/admin_detail/{{id}}';">{{nick}}</td>
         <td class="cursor_pointer" onclick="location.href='/user/admin_detail/{{id}}';">{{email}}</td>
-        <td>{{createdAt}} / {{modifiedAt}}
+        <td>{{formatDateTime createdAt}} / {{formatDateTime modifiedAt}}
             <div class="hide">
                 <input class="input_cursor_user_id" value="{{id}}"/>
                 <input class="input_cursor_user_title" value="{{email}}"/>
