@@ -13,7 +13,7 @@
         <td><font class="font_board_deleted_{{deleted}} chk_board_deleted_{{id}}">{{deleted}}</font></td>
         <td class="cursor_pointer" onclick="location.href='/board/admin_detail/{{id}}';">{{title}}</td>
         <td style="text-align: right;">{{countread}}</td>
-        <td>{{createdAt}} / {{modifiedAt}}
+        <td>{{formatDateTime createdAt}} / {{formatDateTime modifiedAt}}
             <div class="hide">
                 <input class="input_cursor_board_id" value="{{id}}"/>
             </div>
