@@ -16,7 +16,7 @@
         </td>
         <td><font class="font_faq_deleted_{{deleted}} chk_faq_deleted_{{id}}">{{deleted}}</font></td>
         <td class="cursor_pointer" onclick="location.href='/faq/admin_detail/{{id}}';">{{title}}</td>
-        <td>{{createdAt}} / {{modifiedAt}}
+        <td>{{formatDateTime createdAt}} / {{formatDateTime modifiedAt}}
             <div class="hide">
                 <input class="input_cursor_faq_id" value="{{id}}"/>
             </div>

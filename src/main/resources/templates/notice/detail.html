@@ -135,7 +135,7 @@
                 } else {
                     $("<div class=\"comment-text\" data-comment-id=\"" + item.id + "\"></div>").text(item.content || "").appendTo($item);
                 }
-                let metaText = ((item.userNick || item.userEmail || "익명") + " · " + (item.createdAt || ""));
+                let metaText = ((item.userNick || item.userEmail || "익명") + " · " + format_display_datetime(item.createdAt));
                 $("<div class=\"comment-meta\"></div>").text(metaText).appendTo($item);
                 if (item.editable === true || item.deletable === true) {
                     let $actions = $("<div class=\"comment-actions\" style=\"margin-top:8px;\"></div>");
@@ -301,6 +301,7 @@
         _data.success = function (obj_data, obj_status, obj_xhr) {
             currentNoticeData = obj_data || {};
             listenerAfterDetail(obj_data, "notice");
+            $(".font_notice_createdAt").text(format_display_datetime(currentNoticeData.createdAt));
             render_notice_extras(currentNoticeData);
             render_notice_comments(noticeId);
         }

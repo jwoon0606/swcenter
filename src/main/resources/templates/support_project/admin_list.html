@@ -17,7 +17,7 @@
         <td><font class="font_support_project_deleted_{{deleted}} chk_support_project_deleted_{{id}}">{{deleted}}</font></td>
         <td class="cursor_pointer" onclick="location.href='/support_project/admin_detail/{{id}}';">{{title}}</td>
         <td>{{publishedDate}}</td>
-        <td>{{createdAt}} / {{modifiedAt}}
+        <td>{{formatDateTime createdAt}} / {{formatDateTime modifiedAt}}
             <div class="hide">
                 <input class="input_cursor_support_project_id" value="{{id}}"/>
             </div>

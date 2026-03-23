@@ -12,7 +12,7 @@
         <td><font class="font_permission_order"></font></td>
         <td><font class="font_permission_deleted_{{deleted}} chk_permission_deleted_{{id}}">{{deleted}}</font></td>
         <td class="cursor_pointer" onclick="location.href='/permission/admin_detail/{{id}}';">{{title}}</td>
-        <td>{{createdAt}} / {{modifiedAt}}
+        <td>{{formatDateTime createdAt}} / {{formatDateTime modifiedAt}}
             <div class="hide">
                 <input class="input_cursor_permission_id" value="{{id}}"/>
                 <input class="input_cursor_permission_title" value="{{title}}"/>

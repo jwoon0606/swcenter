@@ -16,7 +16,7 @@
         </td>
         <td><font class="font_popup_deleted_{{deleted}} chk_popup_deleted_{{id}}">{{deleted}}</font></td>
         <td class="cursor_pointer" onclick="location.href='/popup/admin_detail/{{id}}';">{{title}}</td>
-        <td>{{createdAt}} / {{modifiedAt}}
+        <td>{{formatDateTime createdAt}} / {{formatDateTime modifiedAt}}
             <div class="hide">
                 <input class="input_cursor_popup_id" value="{{id}}"/>
             </div>

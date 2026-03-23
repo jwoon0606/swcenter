@@ -2,9 +2,11 @@ package com.thc.sprbasic2025.domain;
 
 import com.thc.sprbasic2025.dto.DefaultDto;
 import com.thc.sprbasic2025.dto.BoardDto;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Index;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,8 +23,14 @@ public class Board extends AuditingFields{
     String subject;
     Boolean anonymous;
 
+    @Column(length = 1000)
     String title;
+
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     String content;
+
+    @Column(length = 2048)
     String img;
 
     Integer countread;
